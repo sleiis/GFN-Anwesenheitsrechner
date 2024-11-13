@@ -14,12 +14,14 @@ namespace Anwesenheitsrechner
     public partial class Form2 : Form
     {
         DateTime selectedDate;
-        private bool isFilled = false;
+        private int index;
+        bool isChange;
         Entry entry;
-        public Form2()
+        public Form2(int index, bool isChange)
         {
             InitializeComponent();
-            this.monthCalendar1.DateSelected += new System.Windows.Forms.DateRangeEventHandler(this.monthCalendar1_DateSelected);
+            this.index = index;
+            this.isChange = isChange;
         }
 
         private void monthCalendar1_DateSelected(object sender, DateRangeEventArgs e)
@@ -34,7 +36,10 @@ namespace Anwesenheitsrechner
 
         private void Button1_clicked(Object sender, System.EventArgs e)
         {
-            isFilled = true;
+            if (!isChange)
+            {
+                Form1.EntryListCount++;
+            }
             transferEntry();
             this.Close();
         }
@@ -45,10 +50,9 @@ namespace Anwesenheitsrechner
         }
         public void transferEntry()
         {
-            if (isFilled)
             {
-                entry.isSet = true;
-                entry.date = selectedDate;
+                entry.index = index;
+                entry.date = monthCalendar1.SelectionStart;
                 entry.isVacation = false;
                 entry.isHoliday = false;
                 entry.isWork = true;
@@ -56,5 +60,6 @@ namespace Anwesenheitsrechner
             }
             Form1.entry = this.entry;
         }
+
     }
 }
