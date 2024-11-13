@@ -7,7 +7,7 @@ namespace definitions
 {
     public struct Entry
     {
-        public bool isSet;
+        public int index;
         public bool isVacation;
         public bool isHoliday;
         public bool isWork;
