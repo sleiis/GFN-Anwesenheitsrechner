@@ -4,11 +4,13 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
+using System.Drawing.Imaging;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using definitions;
+using DynamicData;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement;
 
 namespace Anwesenheitsrechner
@@ -17,6 +19,8 @@ namespace Anwesenheitsrechner
     {
         private DateTime currentDate = new DateTime();
         public static Entry entry;
+        private Entry[] entryList = new Entry[31];
+        public static int EntryListCount = 0;
         ContextMenuStrip ListContext = new ContextMenuStrip();
 
         public Form1()
@@ -27,23 +31,33 @@ namespace Anwesenheitsrechner
             month_select.SelectedIndex = (currentDate.Month) - 1;
             ListContext.Items.Add("bearbeiten");
             ListContext.Opening += checkListSelection;
-            ListContext.ItemClicked += ListContext_Click;
+            ListContext.ItemClicked += new ToolStripItemClickedEventHandler(this.ListContext_Click);
             ListContext.Items.Add("löschen");
             listView.ContextMenuStrip = ListContext;
 
         }
 
-        private void ListContext_Click(object sender, EventArgs e)
+        private void ListContext_Click(object sender, ToolStripItemClickedEventArgs e)
         {
             ContextMenuStrip item = sender as ContextMenuStrip;
             ToolStripItemClickedEventArgs args = e as ToolStripItemClickedEventArgs;
 
             if (args.ClickedItem.Text == "bearbeiten")
             {
-                if (listView.SelectedItems.Count == 0)
-                {
-
-                }
+                int index = int.Parse(listView.SelectedItems[0].SubItems[0].Text);
+                Form changeEntry = new Form2(index, true);
+                MonthCalendar monthCalendar = changeEntry.Controls.Find("monthCalendar1", false)[0] as MonthCalendar;
+                changeEntry.Text = "Eintrag ändern";
+                changeEntry.Controls.Find("Button1", false)[0].Text = "Ändern";
+                entry.location = (listView.SelectedItems[0].SubItems[1].Text == "Standort") ? 0 : 1;
+                entry.index = index;
+                //myDialog(listView.SelectedItems[0].SubItems[1].Text);
+                entry.date = DateTime.Parse(listView.SelectedItems[0].SubItems[1].Text);
+                monthCalendar.ShowTodayCircle = false;
+                monthCalendar.SelectionStart = entry.date.Date;
+                monthCalendar.SelectionEnd = entry.date.Date;
+                changeEntry.FormClosed += EntryWorkForm_FormClosed;
+                changeEntry.Show();
             }
 
 
@@ -56,28 +70,33 @@ namespace Anwesenheitsrechner
                 {
                     ListContext.Items[0].Enabled = false;
                     ListContext.Items[1].Enabled = false;
-            }
+                }
+                else if (listView.SelectedItems.Count == 1)
+                {
+                    ListContext.Items[0].Enabled = true;
+                    ListContext.Items[1].Enabled = true;
+                }
                 else
                 {
-                ListContext.Items[0].Enabled = true;
+                ListContext.Items[0].Enabled = false;
                 ListContext.Items[1].Enabled = true;
-            }
+                }
 
         }
 
-        private void myDialog()
+        private void myDialog(String text)
         {
             Form dialog = new Form();
-            Label text = new Label();
-            text.Text = "";
-            text.AutoSize = true;
-            dialog.Controls.Add(text);
+            Label label = new Label();
+            label.Text = text;
+            label.AutoSize = true;
+            dialog.Controls.Add(label);
             dialog.ShowDialog();
         }
 
         private void button1_Click(object sender, System.EventArgs e)
         {
-            Form EntryWorkForm = new Form2();
+            Form EntryWorkForm = new Form2(EntryListCount, false);
             EntryWorkForm.Show();
             EntryWorkForm.FormClosed += EntryWorkForm_FormClosed;
 
@@ -86,28 +105,34 @@ namespace Anwesenheitsrechner
         private void EntryWorkForm_FormClosed(object sender, FormClosedEventArgs e)
         {
             String Date = entry.date.ToString("D");
-            String index = entry.date.Day.ToString();
+            int index = entry.index;
+            entryList.Replace(entryList.ElementAt(index), entry);
             String location;
-            if (entry.isSet)
+            if (entry.location == 0)
             {
-                if (entry.location == 0)
-                {
-                    location = "Standort";
-                }
-                else
-                {
-                    location = "Homeoffice";
-                }
-                entry.isSet = false;
+                location = "Standort";
             }
             else
             {
-                return;
+                location = "Homeoffice";
             }
-            var item = new ListViewItem(index);  
+
+            var item = new ListViewItem(index.ToString());  
             item.SubItems.Add(Date);
             item.SubItems.Add(location);
-            listView.Items.Add(item);
+            //listView.Items.Remove(listView.FindItemWithText(index.ToString()));
+            myDialog(index.ToString());
+            if (listView.Items.Count == 0)
+            {
+                listView.Items.Add(item);
+            }
+            else
+            {
+                if (listView.Items.Count != index) listView.Items.Remove(listView.SelectedItems[0]);
+                listView.Items.Insert(index, item);
+                myDialog(listView.Items[index].SubItems[0].Text);
+            }
+
             listView.AutoResizeColumns(ColumnHeaderAutoResizeStyle.ColumnContent);
         }
 
