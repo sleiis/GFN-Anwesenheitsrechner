@@ -13,6 +13,7 @@ namespace definitions
         public bool isWork;
         public DateTime date;
         public int location;
+        public bool sickday;
     };
 
 

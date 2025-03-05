@@ -6,7 +6,6 @@ using System.Data;
 using System.Drawing;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace Anwesenheitsrechner
@@ -22,6 +21,8 @@ namespace Anwesenheitsrechner
             InitializeComponent();
             this.index = index;
             this.isChange = isChange;
+            monthCalendar1.SelectionStart = DateTime.Today;
+            monthCalendar1.SelectionEnd = DateTime.Today;
         }
 
         private void monthCalendar1_DateSelected(object sender, DateRangeEventArgs e)
@@ -38,9 +39,13 @@ namespace Anwesenheitsrechner
         {
             if (!isChange)
             {
-                Form1.EntryListCount++;
+                Form1.isChange = false;
             }
-            transferEntry();
+            else
+            {
+                Form1.isChange = true;
+            }
+                transferEntry();
             this.Close();
         }
 
@@ -61,5 +66,18 @@ namespace Anwesenheitsrechner
             Form1.entry = this.entry;
         }
 
+        private void changed_sickday(object sender, EventArgs e)
+        {
+            if (checkBox1.Checked)
+            {
+                this.radioButton1.Enabled = false;
+                this.radioButton2.Enabled = false;
+            }
+            else
+            {
+                this.radioButton1.Enabled = true;
+                this.radioButton2.Enabled = true;
+            }
+        }
     }
 }

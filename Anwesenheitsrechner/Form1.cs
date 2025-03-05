@@ -10,8 +10,6 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using definitions;
-using DynamicData;
-using static System.Windows.Forms.VisualStyles.VisualStyleElement;
 
 namespace Anwesenheitsrechner
 {
@@ -19,9 +17,9 @@ namespace Anwesenheitsrechner
     {
         private DateTime currentDate = new DateTime();
         public static Entry entry;
-        private Entry[] entryList = new Entry[31];
-        public static int EntryListCount = 0;
+        public static bool isChange;
         ContextMenuStrip ListContext = new ContextMenuStrip();
+        DataHandler DataHandler = new DataHandler();
 
         public Form1()
         {
@@ -34,7 +32,28 @@ namespace Anwesenheitsrechner
             ListContext.ItemClicked += new ToolStripItemClickedEventHandler(this.ListContext_Click);
             ListContext.Items.Add("löschen");
             listView.ContextMenuStrip = ListContext;
+            DataHandler.readSettings();
 
+        }
+
+        private void calculateRatio()
+        {
+            int Count = listView.Items.Count;
+            int homeCount = 0;
+            int workCount = 0;
+
+            foreach (ListViewItem item in listView.Items)
+            {
+                //myDialog(item.SubItems[2].Text);
+                if (item.SubItems[2].Text == "Standort") workCount++;
+                if (item.SubItems[2].Text == "Homeoffice") homeCount++;
+            }
+
+            if (Count == 0) return;
+
+            if (homeCount > 0) label9.Text = (float)((homeCount * 100/ Count)) + "%";
+            if (workCount > 0) label11.Text = (float)((workCount * 100 / Count)) + "%";
+            //label11.Text = ((workCount / Count) * 100).ToString() + "%";
         }
 
         private void ListContext_Click(object sender, ToolStripItemClickedEventArgs e)
@@ -44,7 +63,7 @@ namespace Anwesenheitsrechner
 
             if (args.ClickedItem.Text == "bearbeiten")
             {
-                int index = int.Parse(listView.SelectedItems[0].SubItems[0].Text);
+                int index = listView.SelectedItems[0].Index;
                 Form changeEntry = new Form2(index, true);
                 MonthCalendar monthCalendar = changeEntry.Controls.Find("monthCalendar1", false)[0] as MonthCalendar;
                 changeEntry.Text = "Eintrag ändern";
@@ -96,7 +115,7 @@ namespace Anwesenheitsrechner
 
         private void button1_Click(object sender, System.EventArgs e)
         {
-            Form EntryWorkForm = new Form2(EntryListCount, false);
+            Form EntryWorkForm = new Form2(listView.Columns[1].Index, false);
             EntryWorkForm.Show();
             EntryWorkForm.FormClosed += EntryWorkForm_FormClosed;
 
@@ -105,9 +124,14 @@ namespace Anwesenheitsrechner
         private void EntryWorkForm_FormClosed(object sender, FormClosedEventArgs e)
         {
             String Date = entry.date.ToString("D");
-            int index = entry.index;
-            entryList.Replace(entryList.ElementAt(index), entry);
             String location;
+            bool sickday = false;
+            
+            if (entry.sickday == true)
+            {
+                location = "--";
+                sickday = true;
+            }
             if (entry.location == 0)
             {
                 location = "Standort";
@@ -120,20 +144,30 @@ namespace Anwesenheitsrechner
             var item = new ListViewItem(index.ToString());  
             item.SubItems.Add(Date);
             item.SubItems.Add(location);
+            item.SubItems.Add(sickday.ToString());
             //listView.Items.Remove(listView.FindItemWithText(index.ToString()));
-            myDialog(index.ToString());
-            if (listView.Items.Count == 0)
+            //myDialog(index.ToString());
+            if (isChange)
             {
-                listView.Items.Add(item);
+                int x = listView.SelectedItems[0].Index;
+                listView.Items.RemoveAt(x);
+                listView.Items.Insert(x, item);
+                
             }
             else
             {
-                if (listView.Items.Count != index) listView.Items.Remove(listView.SelectedItems[0]);
-                listView.Items.Insert(index, item);
-                myDialog(listView.Items[index].SubItems[0].Text);
+                listView.Items.Add(item);
+                //myDialog(listView.Items[index].SubItems[0].Text);
             }
+            
 
             listView.AutoResizeColumns(ColumnHeaderAutoResizeStyle.ColumnContent);
+            calculateRatio();
+            ListViewItemColumnSorter columnSorter = new ListViewItemColumnSorter();
+            listView.ListViewItemSorter = columnSorter;
+
+            listView.Sort();
+            listView.ListViewItemSorter = null;
         }
 
 
@@ -146,6 +180,20 @@ namespace Anwesenheitsrechner
         private void listView_SelectedIndexChanged(object sender, EventArgs e)
         {
 
+        }
+        public class ListViewItemColumnSorter : IComparer
+        {
+            public int curColumn = 1;
+            public bool int_mode = false;
+            public int Compare(object x, object y)
+            {
+                string a = ((ListViewItem)x).SubItems[curColumn].Text;
+                string b = ((ListViewItem)y).SubItems[curColumn].Text;
+                if (int_mode)
+                    return int.Parse(a) - int.Parse(b);
+                else
+                    return DateTime.Compare(DateTime.Parse(a), DateTime.Parse(b));
+            }
         }
     }
 
