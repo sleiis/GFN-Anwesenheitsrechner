@@ -4,6 +4,7 @@ using definitions;
 using System.Data.SQLite;
 using System.Data.Entity;
 using Microsoft.Data.Sqlite;
+using System.Windows.Forms;
 
 namespace Anwesenheitsrechner
 {
@@ -12,11 +13,15 @@ namespace Anwesenheitsrechner
 
         public struct Settings
         {
-            public String language;
+            public int language;
         }
 
-        private const String dataFilepath = "%documents%/Anwesenheitsrechner/data.json";
-        private const String settingsFilepath = "%documents%/Anwesenheitsrechner/settings.json";
+        enum Language
+        {
+            Deutsch,
+            English
+        }
+
         private String data;
         private Settings settings;
         private SQLiteConnection sqlite_conn;
@@ -24,15 +29,18 @@ namespace Anwesenheitsrechner
 
         public DataHandler()
         {
-            openSettingsFile(settingsFilepath);
-            openDataFile(dataFilepath);
             sqlite_conn = CreateConnection();
 
             SQLiteDataReader sqlite_datareader;
             SQLiteCommand sqlite_cmd;
             sqlite_cmd = sqlite_conn.CreateCommand();
+            // Creates Settings Table if it does not exist
             sqlite_cmd.CommandText = "Create Table if not exists Settings (name, value)";
             sqlite_cmd.ExecuteNonQuery();
+            // Creates Table for current month if it does not exist
+            sqlite_cmd.CommandText = "Create Table if not exists '" + DateTime.Now.Month.ToString() + "." + DateTime.Now.Year.ToString() + "' (date, location, sickday)";
+            sqlite_cmd.ExecuteNonQuery();
+            // Set default language to German
             sqlite_cmd.CommandText = "Select count(*) From Settings where name='language'";
             sqlite_datareader = sqlite_cmd.ExecuteReader();
             if (sqlite_datareader.Read())
@@ -45,6 +53,8 @@ namespace Anwesenheitsrechner
             {
                 sqlite_datareader.Close();
             }
+
+            readSettings();
         }
 
         static SQLiteConnection CreateConnection()
@@ -52,21 +62,20 @@ namespace Anwesenheitsrechner
 
             SQLiteConnection sqlite_conn;
             sqlite_conn = new SQLiteConnection("Data Source=database.db; Version = 3; New = True; Compress = True; ");
-         try
+            try
             {
                 sqlite_conn.Open();
             }
             catch (Exception ex)
             {
-
+                DialogResult dialogResult = MessageBox.Show("Datenbank konnte nicht geöffnet werden. Fehler: " + ex.Message, "Fehler", MessageBoxButtons.OK);
+                Application.Exit();
             }
             return sqlite_conn;
         }
 
-        public Settings readSettings()
+        public void readSettings()
         {
-            Settings setting;
-            setting.language = "Deutsch";
             SQLiteDataReader sqlite_datareader;
             SQLiteCommand sqlite_cmd;
             sqlite_cmd = sqlite_conn.CreateCommand();
@@ -75,18 +84,10 @@ namespace Anwesenheitsrechner
             sqlite_datareader = sqlite_cmd.ExecuteReader();
             while (sqlite_datareader.Read())
             {
-                setting.language = sqlite_datareader.GetString(1);
+                settings.language = (int)Enum.Parse(typeof(Language), sqlite_datareader.GetString(1));
             }
-
-
-            return setting;
         }
 
-        public Entry[] getEntryList(DateTime TimeRange)
-        {
-            Entry[] entry = new Entry[31];
-            return entry;
-        }
 
         private void openSettingsFile(String path)
         {

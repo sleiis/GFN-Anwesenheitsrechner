@@ -45,14 +45,14 @@ namespace Anwesenheitsrechner
             foreach (ListViewItem item in listView.Items)
             {
                 //myDialog(item.SubItems[2].Text);
-                if (item.SubItems[2].Text == "Standort") workCount++;
-                if (item.SubItems[2].Text == "Homeoffice") homeCount++;
+                if (item.SubItems[1].Text == "Standort") workCount++;
+                if (item.SubItems[1].Text == "Homeoffice") homeCount++;
             }
 
             if (Count == 0) return;
 
-            if (homeCount > 0) label9.Text = (float)((homeCount * 100/ Count)) + "%";
-            if (workCount > 0) label11.Text = (float)((workCount * 100 / Count)) + "%";
+            if (homeCount > 0) stat_total_ho.Text = (float)((homeCount * 100/ Count)) + "%";
+            if (workCount > 0) stat_total_pre.Text = (float)((workCount * 100 / Count)) + "%";
             //label11.Text = ((workCount / Count) * 100).ToString() + "%";
         }
 
@@ -78,6 +78,12 @@ namespace Anwesenheitsrechner
                 changeEntry.FormClosed += EntryWorkForm_FormClosed;
                 changeEntry.Show();
             }
+            if (args.ClickedItem.Text == "löschen")
+            {
+                listView.Items.RemoveAt(listView.SelectedItems[0].Index);
+                calculateRatio();
+            }
+
 
 
         }
@@ -127,11 +133,7 @@ namespace Anwesenheitsrechner
             String location;
             bool sickday = false;
             
-            if (entry.sickday == true)
-            {
-                location = "--";
-                sickday = true;
-            }
+
             if (entry.location == 0)
             {
                 location = "Standort";
@@ -140,11 +142,15 @@ namespace Anwesenheitsrechner
             {
                 location = "Homeoffice";
             }
+            if (entry.sickday == true)
+            {
+                location = "--";
+                sickday = true;
+            }
 
-            var item = new ListViewItem(index.ToString());  
-            item.SubItems.Add(Date);
+            var item = new ListViewItem(Date);  
             item.SubItems.Add(location);
-            item.SubItems.Add(sickday.ToString());
+            item.SubItems.Add(sickday ? "Ja" : "Nein");
             //listView.Items.Remove(listView.FindItemWithText(index.ToString()));
             //myDialog(index.ToString());
             if (isChange)
@@ -159,9 +165,10 @@ namespace Anwesenheitsrechner
                 listView.Items.Add(item);
                 //myDialog(listView.Items[index].SubItems[0].Text);
             }
-            
 
-            listView.AutoResizeColumns(ColumnHeaderAutoResizeStyle.ColumnContent);
+
+            //listView.AutoResizeColumns(ColumnHeaderAutoResizeStyle.ColumnContent);
+            //listView.Columns[2].Width = 50;
             calculateRatio();
             ListViewItemColumnSorter columnSorter = new ListViewItemColumnSorter();
             listView.ListViewItemSorter = columnSorter;
@@ -183,7 +190,7 @@ namespace Anwesenheitsrechner
         }
         public class ListViewItemColumnSorter : IComparer
         {
-            public int curColumn = 1;
+            public int curColumn = 0;
             public bool int_mode = false;
             public int Compare(object x, object y)
             {
@@ -194,6 +201,11 @@ namespace Anwesenheitsrechner
                 else
                     return DateTime.Compare(DateTime.Parse(a), DateTime.Parse(b));
             }
+        }
+
+        private void Form1_Load(object sender, EventArgs e)
+        {
+
         }
     }
 

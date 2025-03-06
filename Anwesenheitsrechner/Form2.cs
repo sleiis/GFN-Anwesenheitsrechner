@@ -45,7 +45,7 @@ namespace Anwesenheitsrechner
             {
                 Form1.isChange = true;
             }
-                transferEntry();
+            transferEntry();
             this.Close();
         }
 
@@ -62,6 +62,7 @@ namespace Anwesenheitsrechner
                 entry.isHoliday = false;
                 entry.isWork = true;
                 entry.location = (radioButton1.Checked == true) ? 0 : 1;
+                entry.sickday = checkBox1.Checked;
             }
             Form1.entry = this.entry;
         }
