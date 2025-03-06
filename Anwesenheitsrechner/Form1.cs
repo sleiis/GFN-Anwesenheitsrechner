@@ -1,12 +1,14 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using definitions;
@@ -25,34 +27,67 @@ namespace Anwesenheitsrechner
         {
             InitializeComponent();
             currentDate = DateTime.Today;
-            year_select.SelectedIndex = (currentDate.Year) - 2024;
-            month_select.SelectedIndex = (currentDate.Month) - 1;
             ListContext.Items.Add("bearbeiten");
             ListContext.Opening += checkListSelection;
             ListContext.ItemClicked += new ToolStripItemClickedEventHandler(this.ListContext_Click);
             ListContext.Items.Add("löschen");
             listView.ContextMenuStrip = ListContext;
             DataHandler.readSettings();
+            initListView();
+            listView.Columns[0].AutoResize(ColumnHeaderAutoResizeStyle.ColumnContent);
+            listView.Columns[1].AutoResize(ColumnHeaderAutoResizeStyle.ColumnContent);
+
+        }
+
+        private void initListView()
+        {
+            int EntryCount = int.Parse(DataHandler.readSQL("Select count(*) From Data;").GetValues(0).ElementAt(0));
+            for (int i = 0; i < EntryCount; i++)
+            {
+                NameValueCollection entry = DataHandler.readSQL("Select * From Data where rowid=" + (i + 1) + ";");
+                String Date = DateTime.Parse(entry.GetValues(0).ElementAt(0)).ToString("D");
+                String location = entry.GetValues(1).ElementAt(0);
+                String sickday = (entry.GetValues(2).ElementAt(0)) == "1" ? "Ja" : "Nein";
+                var item = new ListViewItem(Date);
+                item.SubItems.Add(location);
+                item.SubItems.Add(sickday);
+                listView.Items.Add(item);
+            }
+            calculateRatio();
+
+            ListViewItemColumnSorter columnSorter = new ListViewItemColumnSorter();
+            listView.ListViewItemSorter = columnSorter;
+
+            listView.Sort();
+            listView.ListViewItemSorter = null;
 
         }
 
         private void calculateRatio()
         {
-            int Count = listView.Items.Count;
+            int Count = 0;
             int homeCount = 0;
             int workCount = 0;
 
             foreach (ListViewItem item in listView.Items)
             {
                 //myDialog(item.SubItems[2].Text);
-                if (item.SubItems[1].Text == "Standort") workCount++;
-                if (item.SubItems[1].Text == "Homeoffice") homeCount++;
+                if (item.SubItems[1].Text == "Standort")
+                {
+                    workCount++;
+                    Count++;
+                }
+                if (item.SubItems[1].Text == "Homeoffice")
+                {
+                    homeCount++;
+                    Count++;
+                }
             }
 
             if (Count == 0) return;
 
-            if (homeCount > 0) stat_total_ho.Text = (float)((homeCount * 100/ Count)) + "%";
-            if (workCount > 0) stat_total_pre.Text = (float)((workCount * 100 / Count)) + "%";
+            if (homeCount > 0) stat_total_ho.Text = (Math.Round((float)homeCount * 100/ Count,2)) + "%";
+            if (workCount > 0) stat_total_pre.Text = (Math.Round((float)workCount * 100 / Count,2)) + "%";
             //label11.Text = ((workCount / Count) * 100).ToString() + "%";
         }
 
@@ -63,6 +98,7 @@ namespace Anwesenheitsrechner
 
             if (args.ClickedItem.Text == "bearbeiten")
             {
+                /*
                 int index = listView.SelectedItems[0].Index;
                 Form changeEntry = new Form2(index, true);
                 MonthCalendar monthCalendar = changeEntry.Controls.Find("monthCalendar1", false)[0] as MonthCalendar;
@@ -71,15 +107,19 @@ namespace Anwesenheitsrechner
                 entry.location = (listView.SelectedItems[0].SubItems[1].Text == "Standort") ? 0 : 1;
                 entry.index = index;
                 //myDialog(listView.SelectedItems[0].SubItems[1].Text);
-                entry.date = DateTime.Parse(listView.SelectedItems[0].SubItems[1].Text);
+                entry.date = DateTime.Parse(listView.SelectedItems[0].SubItems[0].Text);
                 monthCalendar.ShowTodayCircle = false;
                 monthCalendar.SelectionStart = entry.date.Date;
                 monthCalendar.SelectionEnd = entry.date.Date;
                 changeEntry.FormClosed += EntryWorkForm_FormClosed;
                 changeEntry.Show();
+                */
+                DialogResult dialogResult = MessageBox.Show("Noch nicht implementiert", "Entwicklernachricht", MessageBoxButtons.OK);
+
             }
             if (args.ClickedItem.Text == "löschen")
             {
+                DataHandler.writeSQL("Delete From Data where date = '" + listView.SelectedItems[0].SubItems[0].Text + "';");
                 listView.Items.RemoveAt(listView.SelectedItems[0].Index);
                 calculateRatio();
             }
@@ -148,17 +188,17 @@ namespace Anwesenheitsrechner
                 sickday = true;
             }
 
-            var item = new ListViewItem(Date);  
+            var item = new ListViewItem(Date);
             item.SubItems.Add(location);
             item.SubItems.Add(sickday ? "Ja" : "Nein");
             //listView.Items.Remove(listView.FindItemWithText(index.ToString()));
             //myDialog(index.ToString());
             if (isChange)
             {
-                int x = listView.SelectedItems[0].Index;
-                listView.Items.RemoveAt(x);
-                listView.Items.Insert(x, item);
-                
+                //int x = listView.SelectedItems[0].Index;
+                //listView.Items.RemoveAt(x);
+                //listView.Items.Insert(x, item);
+
             }
             else
             {
@@ -175,6 +215,10 @@ namespace Anwesenheitsrechner
 
             listView.Sort();
             listView.ListViewItemSorter = null;
+
+            // SQL
+            
+            DataHandler.writeSQL("Insert Into 'Data' (date,location,sickday) Values ('" + entry.date.ToShortDateString() + "', '" + location + "', " + entry.sickday.ToString() + ");");
         }
 
 
@@ -184,10 +228,6 @@ namespace Anwesenheitsrechner
             EntryHolidayForm.Show();
         }
 
-        private void listView_SelectedIndexChanged(object sender, EventArgs e)
-        {
-
-        }
         public class ListViewItemColumnSorter : IComparer
         {
             public int curColumn = 0;
