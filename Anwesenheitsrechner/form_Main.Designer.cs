@@ -1,6 +1,6 @@
 ﻿namespace Anwesenheitsrechner
 {
-    partial class Form1
+    partial class form_Main
     {
         /// <summary>
         /// Erforderliche Designervariable.
@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(form_Main));
             this.bt_addEntry = new System.Windows.Forms.Button();
             this.listView = new System.Windows.Forms.ListView();
             this.Datum = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
@@ -51,13 +52,13 @@
             // bt_addEntry
             // 
             this.bt_addEntry.Font = new System.Drawing.Font("Bahnschrift SemiBold", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.bt_addEntry.Location = new System.Drawing.Point(34, 381);
+            this.bt_addEntry.Location = new System.Drawing.Point(16, 376);
             this.bt_addEntry.Name = "bt_addEntry";
             this.bt_addEntry.Size = new System.Drawing.Size(146, 40);
             this.bt_addEntry.TabIndex = 0;
             this.bt_addEntry.Text = "Anwesenheit eintragen";
             this.bt_addEntry.UseVisualStyleBackColor = true;
-            this.bt_addEntry.Click += new System.EventHandler(this.button1_Click);
+            this.bt_addEntry.Click += new System.EventHandler(this.bt_addEntry_clicked);
             // 
             // listView
             // 
@@ -70,7 +71,7 @@
             this.listView.GridLines = true;
             this.listView.HideSelection = false;
             this.listView.LabelWrap = false;
-            this.listView.Location = new System.Drawing.Point(34, 23);
+            this.listView.Location = new System.Drawing.Point(16, 18);
             this.listView.Name = "listView";
             this.listView.Size = new System.Drawing.Size(454, 235);
             this.listView.Sorting = System.Windows.Forms.SortOrder.Descending;
@@ -108,7 +109,7 @@
             this.panel1.Controls.Add(this.label4);
             this.panel1.Controls.Add(this.label3);
             this.panel1.Font = new System.Drawing.Font("Bahnschrift SemiBold", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.panel1.Location = new System.Drawing.Point(194, 292);
+            this.panel1.Location = new System.Drawing.Point(176, 287);
             this.panel1.Name = "panel1";
             this.panel1.RightToLeft = System.Windows.Forms.RightToLeft.No;
             this.panel1.Size = new System.Drawing.Size(294, 131);
@@ -210,40 +211,42 @@
             // 
             // bt_vacation
             // 
+            this.bt_vacation.Enabled = false;
             this.bt_vacation.Font = new System.Drawing.Font("Bahnschrift SemiBold", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.bt_vacation.Location = new System.Drawing.Point(34, 336);
+            this.bt_vacation.Location = new System.Drawing.Point(16, 331);
             this.bt_vacation.Name = "bt_vacation";
             this.bt_vacation.Size = new System.Drawing.Size(146, 40);
             this.bt_vacation.TabIndex = 7;
             this.bt_vacation.Text = "Urlaub eintragen";
             this.bt_vacation.UseVisualStyleBackColor = true;
-            this.bt_vacation.Click += new System.EventHandler(this.button2_Click);
+            this.bt_vacation.Click += new System.EventHandler(this.bt_vacation_clicked);
             // 
             // bt_settings
             // 
             this.bt_settings.Font = new System.Drawing.Font("Bahnschrift SemiBold", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.bt_settings.Location = new System.Drawing.Point(34, 290);
+            this.bt_settings.Location = new System.Drawing.Point(16, 285);
             this.bt_settings.Name = "bt_settings";
             this.bt_settings.Size = new System.Drawing.Size(146, 40);
             this.bt_settings.TabIndex = 10;
             this.bt_settings.Text = "Einstellungen";
             this.bt_settings.UseVisualStyleBackColor = true;
+            this.bt_settings.Click += new System.EventHandler(this.bt_settings_clicked);
             // 
-            // Form1
+            // form_Main
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(514, 436);
+            this.ClientSize = new System.Drawing.Size(486, 436);
             this.Controls.Add(this.bt_settings);
             this.Controls.Add(this.bt_vacation);
             this.Controls.Add(this.panel1);
             this.Controls.Add(this.listView);
             this.Controls.Add(this.bt_addEntry);
             this.Font = new System.Drawing.Font("Bahnschrift SemiBold", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.Name = "Form1";
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
+            this.Name = "form_Main";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
-            this.Text = "Anwesenheitsrechner";
-            this.Load += new System.EventHandler(this.Form1_Load);
+            this.Text = "GFN Anwesenheitsrechner";
             this.panel1.ResumeLayout(false);
             this.panel1.PerformLayout();
             this.ResumeLayout(false);

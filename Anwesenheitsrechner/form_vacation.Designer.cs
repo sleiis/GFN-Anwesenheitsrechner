@@ -1,6 +1,6 @@
 ﻿namespace Anwesenheitsrechner
 {
-    partial class Form3
+    partial class form_vacation
     {
         /// <summary>
         /// Required designer variable.
@@ -28,39 +28,39 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.monthCalendar1 = new System.Windows.Forms.MonthCalendar();
-            this.button2 = new System.Windows.Forms.Button();
-            this.button1 = new System.Windows.Forms.Button();
+            this.mc_dateselect = new System.Windows.Forms.MonthCalendar();
+            this.bt_cancel = new System.Windows.Forms.Button();
+            this.bt_add = new System.Windows.Forms.Button();
             this.label1 = new System.Windows.Forms.Label();
             this.SuspendLayout();
             // 
-            // monthCalendar1
+            // mc_dateselect
             // 
-            this.monthCalendar1.BackColor = System.Drawing.SystemColors.Control;
-            this.monthCalendar1.Location = new System.Drawing.Point(89, 18);
-            this.monthCalendar1.MaxSelectionCount = 14;
-            this.monthCalendar1.MinDate = new System.DateTime(2024, 1, 1, 0, 0, 0, 0);
-            this.monthCalendar1.Name = "monthCalendar1";
-            this.monthCalendar1.TabIndex = 12;
+            this.mc_dateselect.BackColor = System.Drawing.SystemColors.Control;
+            this.mc_dateselect.Location = new System.Drawing.Point(89, 18);
+            this.mc_dateselect.MaxSelectionCount = 14;
+            this.mc_dateselect.MinDate = new System.DateTime(2024, 1, 1, 0, 0, 0, 0);
+            this.mc_dateselect.Name = "mc_dateselect";
+            this.mc_dateselect.TabIndex = 12;
             // 
-            // button2
+            // bt_cancel
             // 
-            this.button2.Location = new System.Drawing.Point(166, 201);
-            this.button2.Name = "button2";
-            this.button2.Size = new System.Drawing.Size(101, 23);
-            this.button2.TabIndex = 11;
-            this.button2.Text = "Abbrechen";
-            this.button2.UseVisualStyleBackColor = true;
-            this.button2.Click += new System.EventHandler(this.Button2_clicked);
+            this.bt_cancel.Location = new System.Drawing.Point(166, 201);
+            this.bt_cancel.Name = "bt_cancel";
+            this.bt_cancel.Size = new System.Drawing.Size(101, 23);
+            this.bt_cancel.TabIndex = 11;
+            this.bt_cancel.Text = "Abbrechen";
+            this.bt_cancel.UseVisualStyleBackColor = true;
+            this.bt_cancel.Click += new System.EventHandler(this.Button2_clicked);
             // 
-            // button1
+            // bt_add
             // 
-            this.button1.Location = new System.Drawing.Point(22, 201);
-            this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(88, 23);
-            this.button1.TabIndex = 10;
-            this.button1.Text = "Hinzufügen";
-            this.button1.UseVisualStyleBackColor = true;
+            this.bt_add.Location = new System.Drawing.Point(22, 201);
+            this.bt_add.Name = "bt_add";
+            this.bt_add.Size = new System.Drawing.Size(88, 23);
+            this.bt_add.TabIndex = 10;
+            this.bt_add.Text = "Hinzufügen";
+            this.bt_add.UseVisualStyleBackColor = true;
             // 
             // label1
             // 
@@ -71,17 +71,17 @@
             this.label1.TabIndex = 7;
             this.label1.Text = "Datum: ";
             // 
-            // Form3
+            // form_vacation
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(289, 249);
-            this.Controls.Add(this.monthCalendar1);
-            this.Controls.Add(this.button2);
-            this.Controls.Add(this.button1);
+            this.Controls.Add(this.mc_dateselect);
+            this.Controls.Add(this.bt_cancel);
+            this.Controls.Add(this.bt_add);
             this.Controls.Add(this.label1);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
-            this.Name = "Form3";
+            this.Name = "form_vacation";
             this.SizeGripStyle = System.Windows.Forms.SizeGripStyle.Hide;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Urlaub eintragen";
@@ -92,9 +92,9 @@
 
         #endregion
 
-        private System.Windows.Forms.MonthCalendar monthCalendar1;
-        private System.Windows.Forms.Button button2;
-        private System.Windows.Forms.Button button1;
+        private System.Windows.Forms.MonthCalendar mc_dateselect;
+        private System.Windows.Forms.Button bt_cancel;
+        private System.Windows.Forms.Button bt_add;
         private System.Windows.Forms.Label label1;
     }
 }

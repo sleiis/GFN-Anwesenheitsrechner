@@ -14,11 +14,6 @@ namespace Anwesenheitsrechner
     internal class DataHandler
     {
 
-        public struct Settings
-        {
-            public int language;
-        }
-
         enum Language
         {
             Deutsch,
@@ -26,9 +21,9 @@ namespace Anwesenheitsrechner
         }
 
         private String data;
-        private Settings settings;
         private SQLiteConnection sqlite_conn;
         private SQLiteCommand sqlite_cmd;
+        private SQLiteDataReader sqlite_datareader;
 
 
         public DataHandler()
@@ -39,14 +34,12 @@ namespace Anwesenheitsrechner
 
         public NameValueCollection readSQL(string cmd)
         {
-            //List<String> output = new List<string>();
-            //output.Clear();
-            SQLiteDataReader sqlite_datareader;
             sqlite_cmd = sqlite_conn.CreateCommand();
             sqlite_cmd.CommandText = cmd;
             sqlite_datareader = sqlite_cmd.ExecuteReader();
             sqlite_datareader.Read();
             NameValueCollection output = sqlite_datareader.GetValues();
+            sqlite_datareader.Close();
             return output;
         }
 
@@ -74,7 +67,7 @@ namespace Anwesenheitsrechner
             writeSQL("Create Table if not exists Settings (name, value);");
 
             // Creates Data Table if it does not exist
-            writeSQL("Create Table if not exists 'Data' (date date, location varchar(20), sickday bool, ID INTEGER PRIMARY KEY AUTOINCREMENT);");
+            writeSQL("Create Table if not exists 'Data' (date date, location varchar(20), sickday bool);");
 
             // Set default language to German   
             if (int.Parse(readSQL("Select count(*) From Settings where name='language';").GetValues(0).ElementAt(0)) == 0)
@@ -111,36 +104,21 @@ namespace Anwesenheitsrechner
             sqlite_datareader = sqlite_cmd.ExecuteReader();
             while (sqlite_datareader.Read())
             {
-                settings.language = (int)Enum.Parse(typeof(Language), sqlite_datareader.GetString(1));
+                form_Main.settings.language = (int)Enum.Parse(typeof(Language), sqlite_datareader.GetString(1));
             }
         }
 
-
-        private void openSettingsFile(String path)
+        public List<Entry> parseWeb(string input)
         {
-            if (File.Exists(path))
-            {
-            }
-            else
-            {
-                Settings settings = new Settings();
-            }
-            return;
-        }
+            List<Entry> output = new List<Entry>();
 
-        private void openDataFile(String path)
-        {
-            if (File.Exists(path))
-            {
-                data = File.ReadAllText(path);
-            }
-            else
-            {
-                return;
-            }
-            return;
-        }
 
+
+
+
+
+            return output;
+        }
 
     }
 }

@@ -10,11 +10,13 @@ using System.Windows.Forms;
 
 namespace Anwesenheitsrechner
 {
-    public partial class Form3 : Form
+    public partial class form_vacation : Form
     {
-        public Form3()
+        form_Main mainform;
+        public form_vacation(form_Main form_Main)
         {
             InitializeComponent();
+            mainform = form_Main;
         }
 
         private void Button2_clicked(Object sender, System.EventArgs e)
