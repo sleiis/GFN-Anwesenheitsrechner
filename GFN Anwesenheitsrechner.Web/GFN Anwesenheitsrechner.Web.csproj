@@ -13,16 +13,17 @@
     <PackageReference Include="Dapper" Version="2.1.66" />
     <PackageReference Include="Microsoft.Data.Sqlite.Core" Version="9.0.2" />
     <PackageReference Include="MudBlazor" Version="8.*" />
+    <PackageReference Include="SQLitePCLRaw.bundle_e_sqlite3" Version="2.1.11" />
   </ItemGroup>
 
 
   <ItemGroup>
-    <Folder Include="Database\FIles\" />
+    <Folder Include="Database\Files\" />
   </ItemGroup>
 
 
   <ItemGroup>
-    <None Update="Database\FIles\CreateTabels.sql">
+    <None Update="Database\Files\CreateTabels.sql">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>

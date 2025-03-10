@@ -1,19 +1,19 @@
--- Check if UsersList table exists and create it if it doesn't
+-- Create UsersList table if it doesn't exist
 CREATE TABLE IF NOT EXISTS UsersList (
-    UserID INT PRIMARY KEY,          -- UserID as the primary key
-    Username NOT NULL VARCHAR(255),           -- Username 
-    Password NOT NULL VARCHAR(255)            -- Password 
+    UserID INTEGER PRIMARY KEY AUTOINCREMENT,  -- Auto-increment primary key
+    Username VARCHAR(255) NOT NULL,            -- Username column
+    Password VARCHAR(255) NOT NULL             -- Password column
 );
 
--- Check if PresenceList table exists and create it if it doesn't
+-- Create PresenceList table if it doesn't exist
 CREATE TABLE IF NOT EXISTS PresenceList (
-    PresenceID INTEGER PRIMARY KEY AUTOINCREMENT,   -- Auto-incremented primary key for each record
-    UserID NOT NULL INT,                            -- Foreign key referencing the UserID in UsersList
+    PresenceID INTEGER PRIMARY KEY AUTOINCREMENT,   -- Auto-incremented primary key
+    UserID INTEGER NOT NULL,                        -- Foreign key referencing UsersList
     Date DATE,                                      -- Date of presence record
-    HomeOffice BOOLEAN,                             -- Indicates if the user was working from home
-    LoginTime DATETIME,                             -- Time when the user logged in
-    LogoutTime DATETIME,                            -- Time when the user logged out
-    CorrectionLogin DATETIME,                       -- Nullable, corrected login time (if any)
-    CorrectionLogout DATETIME,                      -- Nullable, corrected logout time (if any)
-    FOREIGN KEY (UserID) REFERENCES UsersList(UserID) -- Foreign key constraint
+    HomeOffice INTEGER CHECK (HomeOffice IN (0, 1)) DEFAULT 0, -- Boolean as INTEGER
+    LoginTime DATETIME,                             -- Time of login
+    LogoutTime DATETIME,                            -- Time of logout
+    CorrectionLogin DATETIME,                       -- Nullable corrected login time
+    CorrectionLogout DATETIME,                      -- Nullable corrected logout time
+    FOREIGN KEY (UserID) REFERENCES UsersList(UserID) ON DELETE CASCADE -- Cascade delete
 );

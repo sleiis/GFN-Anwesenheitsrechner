@@ -6,9 +6,9 @@ namespace GFN_Anwesenheitsrechner.Web.Database
 {
     public class ConnectionManager
     {
-        private static string connectionString { get { return "Data Source=Database/FIles/Presence.db"; } }
-        private static string sqlFilePath { get { return "Database/FIles/CreateTabels.sql"; } }
-        private static string dbFilePath { get { return "Database/FIles/Presence.db"; } }
+        private static string connectionString { get { return "Data Source=Database/Files/Presence.db"; } }
+        private static string sqlFilePath { get { return "Database/Files/CreateTabels.sql"; } }
+        private static string dbFilePath { get { return "Database/Files/Presence.db"; } }
         public async Task<bool> IsConnected()
         {
             using (var connection = new SqliteConnection(connectionString))
@@ -25,25 +25,45 @@ namespace GFN_Anwesenheitsrechner.Web.Database
             }
         }
         // Create the database if not exists
+
         public static void CreateDatabase()
         {
-            // Ensure the SQL file exists
+            string directoryPath = Path.GetDirectoryName(dbFilePath)!;
+
+            if (!Directory.Exists(directoryPath))
+            {
+                Directory.CreateDirectory(directoryPath); // Create missing folder
+            }
+
             if (!File.Exists(dbFilePath))
             {
                 GFNLogger.Log("Creating SQLite database...");
-                string sqlQuery = File.ReadAllText(sqlFilePath);  // Read the SQL from the file
 
                 using (var connection = new SqliteConnection(connectionString))
                 {
                     connection.Open();
-                    // Execute the SQL script using Dapper
-                    connection.Execute(sqlQuery);  // Dapper will execute the SQL commands in the script file
+
+                    if (File.Exists(sqlFilePath))
+                    {
+                        string sqlQuery = File.ReadAllText(sqlFilePath);
+                        using (var command = connection.CreateCommand())
+                        {
+                            command.CommandText = sqlQuery;
+                            command.ExecuteNonQuery();
+                        }
+                        GFNLogger.Log("Database schema applied.");
+                    }
+                    else
+                    {
+                        GFNLogger.Log("SQL schema file not found!");
+                    }
                 }
+
                 GFNLogger.Log("Database created successfully.");
             }
             else
             {
-                GFNLogger.Log("Database already exists."); //A bit of extra Logs!
+                GFNLogger.Log("Database already exists.");
             }
         }
         // Loads a list of data from the database using the specified SQL query and parameters.

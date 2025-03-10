@@ -8,6 +8,7 @@ namespace GFN_Anwesenheitsrechner.Web
     {
         public static void Main(string[] args)
         {
+            SQLitePCL.Batteries.Init();
             ConnectionManager.CreateDatabase();
             var builder = WebApplication.CreateBuilder(args);
 
