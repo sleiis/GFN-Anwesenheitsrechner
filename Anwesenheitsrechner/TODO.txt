@@ -1,4 +1,1 @@
-﻿- ListView in 2 Spalten: Datum | Standort
-- ListView bei jedem AddEntry sortieren
-- Laden und Speichern von Daten
-- Berechnung der Prozentsätze
+
