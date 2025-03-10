@@ -23,6 +23,7 @@ namespace Anwesenheitsrechner
 
         public DataHandler()
         {
+            sqlite_conn = CreateConnection();
             initDB();
             readSettings();
         }
@@ -46,13 +47,18 @@ namespace Anwesenheitsrechner
             }
         }
 
-        public int writeSQL(string cmd)
+        public int writeSQL(string cmd, params SQLiteParameter[] parameters)
         {
             sqlite_cmd = sqlite_conn.CreateCommand();
             sqlite_cmd.CommandText = cmd;
             try
             {
-                sqlite_cmd.ExecuteNonQuery();
+                using (var sqlite_cmd = sqlite_conn.CreateCommand())
+                {
+                    sqlite_cmd.CommandText = cmd;
+                    sqlite_cmd.Parameters.AddRange(parameters);
+                    return sqlite_cmd.ExecuteNonQuery();
+                }
             }
             catch (Exception ex)
             {
@@ -64,8 +70,6 @@ namespace Anwesenheitsrechner
 
         void initDB()
         {
-
-            sqlite_conn = CreateConnection();
             try
             {
                 // Creates Settings Table if it does not exist
@@ -108,11 +112,28 @@ namespace Anwesenheitsrechner
         public void readSettings()
         {
             SQLiteDataReader sqlite_datareader;
-
             try
             {
-                sqlite_cmd = sqlite_conn.CreateCommand();
-                sqlite_cmd.CommandText = "SELECT * FROM Settings;";
+
+                using (var sqlite_cmd = sqlite_conn.CreateCommand())
+                {
+                    sqlite_cmd.CommandText = "SELECT * FROM Settings;";
+                    using (SQLiteDataReader sqlite_datareader = sqlite_cmd.ExecuteReader())
+                    {
+                        sqlite_datareader.Read();
+                        return new Settings
+                        {
+                            Language = (int)Enum.Parse(typeof(Language), sqlite_datareader.GetString(1))
+                        };
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Fehler beim Lesen der Einstellungen: " + ex.Message, "Fehler", MessageBoxButtons.OK);
+            }
+            return new Settings {Language = 0};
+        }
 
                 sqlite_datareader = sqlite_cmd.ExecuteReader();
                 while (sqlite_datareader.Read())

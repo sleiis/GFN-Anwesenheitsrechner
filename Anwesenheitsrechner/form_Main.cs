@@ -188,8 +188,13 @@ namespace Anwesenheitsrechner
 
             listView.Rows.Add(Date, location, entry.sickday ? "Ja" : "Nein");
 
+
             // Insert into SQL database
-            DataHandler.writeSQL($"Insert Into 'Data' (date, location, sickday) Values ('{entry.date.ToShortDateString()}', '{location}', {entry.sickday.ToString()});");
+            listView.Items.Add(item);
+            DataHandler.writeSQL("INSERT INTO Data (date, location, sickday) VALUES (@date, @location, @sickday)",
+                new System.Data.SQLite.SQLiteParameter("@date", entry.date.ToShortDateString()),
+                new System.Data.SQLite.SQLiteParameter("@location", location),
+                new System.Data.SQLite.SQLiteParameter("@sickday", entry.sickday.ToString()));
 
             calculateDayRatio();
         }

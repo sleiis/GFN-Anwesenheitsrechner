@@ -9,3 +9,4 @@ using System.Diagnostics.CodeAnalysis;
 [assembly: SuppressMessage("Minor Code Smell", "S1104:Fields should not have public accessibility", Justification = "<Ausstehend>", Scope = "member", Target = "~F:Anwesenheitsrechner.form_Main.Settings")]
 [assembly: SuppressMessage("Style", "IDE0071:Interpolation vereinfachen", Justification = "<Ausstehend>", Scope = "member", Target = "~M:Anwesenheitsrechner.form_Main.initListView")]
 [assembly: SuppressMessage("Major Code Smell", "S3358:Ternary operators should not be nested", Justification = "<Ausstehend>", Scope = "member", Target = "~M:Anwesenheitsrechner.form_addedit.bt_add_clicked(System.Object,System.EventArgs)")]
+[assembly: SuppressMessage("Performance", "HAA0101:Array allocation for params parameter", Justification = "<Ausstehend>", Scope = "member", Target = "~M:Anwesenheitsrechner.form_Main.addEntry(definitions.Entry)")]
