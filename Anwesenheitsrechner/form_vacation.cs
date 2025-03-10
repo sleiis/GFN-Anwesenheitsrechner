@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Anwesenheitsrechner.CustomUI;
+using System;
 using System.Windows.Forms;
 
 namespace Anwesenheitsrechner
@@ -12,10 +13,9 @@ namespace Anwesenheitsrechner
             mainform = form_Main;
         }
 
-        private void Button2_clicked(Object sender, System.EventArgs e)
+        private void bt_add_Click(object sender, EventArgs e)
         {
-            this.Close();
-        }
 
+        }
     }
 }
