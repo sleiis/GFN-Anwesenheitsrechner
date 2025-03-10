@@ -37,6 +37,7 @@
             this.bt_cancel = new System.Windows.Forms.Button();
             this.rb_web = new System.Windows.Forms.RadioButton();
             this.rb_php = new System.Windows.Forms.RadioButton();
+            this.bt_cleardb = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // l_language
@@ -60,7 +61,7 @@
             // 
             // tb_websiteparse
             // 
-            this.tb_websiteparse.Location = new System.Drawing.Point(15, 107);
+            this.tb_websiteparse.Location = new System.Drawing.Point(15, 117);
             this.tb_websiteparse.Name = "tb_websiteparse";
             this.tb_websiteparse.Size = new System.Drawing.Size(403, 157);
             this.tb_websiteparse.TabIndex = 2;
@@ -70,7 +71,7 @@
             // label1
             // 
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(12, 82);
+            this.label1.Location = new System.Drawing.Point(12, 92);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(181, 13);
             this.label1.TabIndex = 3;
@@ -78,7 +79,7 @@
             // 
             // bt_parse
             // 
-            this.bt_parse.Location = new System.Drawing.Point(15, 270);
+            this.bt_parse.Location = new System.Drawing.Point(15, 280);
             this.bt_parse.Name = "bt_parse";
             this.bt_parse.Size = new System.Drawing.Size(403, 23);
             this.bt_parse.TabIndex = 4;
@@ -110,7 +111,7 @@
             // 
             this.rb_web.AutoSize = true;
             this.rb_web.Checked = true;
-            this.rb_web.Location = new System.Drawing.Point(219, 81);
+            this.rb_web.Location = new System.Drawing.Point(219, 91);
             this.rb_web.Name = "rb_web";
             this.rb_web.Size = new System.Drawing.Size(48, 17);
             this.rb_web.TabIndex = 7;
@@ -122,7 +123,7 @@
             // rb_php
             // 
             this.rb_php.AutoSize = true;
-            this.rb_php.Location = new System.Drawing.Point(311, 81);
+            this.rb_php.Location = new System.Drawing.Point(311, 91);
             this.rb_php.Name = "rb_php";
             this.rb_php.Size = new System.Drawing.Size(47, 17);
             this.rb_php.TabIndex = 8;
@@ -130,11 +131,22 @@
             this.rb_php.UseVisualStyleBackColor = true;
             this.rb_php.CheckedChanged += new System.EventHandler(this.rb_changed);
             // 
+            // bt_cleardb
+            // 
+            this.bt_cleardb.Location = new System.Drawing.Point(15, 52);
+            this.bt_cleardb.Name = "bt_cleardb";
+            this.bt_cleardb.Size = new System.Drawing.Size(99, 23);
+            this.bt_cleardb.TabIndex = 9;
+            this.bt_cleardb.Text = "Database leeren";
+            this.bt_cleardb.UseVisualStyleBackColor = true;
+            this.bt_cleardb.Click += new System.EventHandler(this.bt_cleardb_clicked);
+            // 
             // form_Settings
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(431, 313);
+            this.Controls.Add(this.bt_cleardb);
             this.Controls.Add(this.rb_php);
             this.Controls.Add(this.rb_web);
             this.Controls.Add(this.bt_cancel);
@@ -169,5 +181,6 @@
         private System.Windows.Forms.Button bt_cancel;
         private System.Windows.Forms.RadioButton rb_web;
         private System.Windows.Forms.RadioButton rb_php;
+        private System.Windows.Forms.Button bt_cleardb;
     }
 }

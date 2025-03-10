@@ -28,26 +28,19 @@ namespace Anwesenheitsrechner
 
         private void bt_add_clicked(Object sender, System.EventArgs e)
         {
-            Entry entry = new Entry();
-
-            if (rb_pre.Checked)
+            Entry entry = new Entry()
             {
-                entry.location = 0;
-            }
-            else if (rb_ho.Checked)
-            {
-                entry.location = 1;
-            }
-            else
-            {
-                entry.location = -1;
-            }
+                date = mc_dateselect.SelectionStart,
+                sickday = cb_sickday.Checked,
+                location = rb_pre.Checked ? 0 : rb_ho.Checked ? 1 : -1
+            };
 
             entry.date = mc_dateselect.SelectionStart;
             entry.sickday = cb_sickday.Checked;
 
             if (edit) mainform.editEntry(entry);
             else mainform.addEntry(entry);
+
             this.Close();
         }
 

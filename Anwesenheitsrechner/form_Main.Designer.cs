@@ -31,9 +31,9 @@
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(form_Main));
             this.bt_addEntry = new System.Windows.Forms.Button();
             this.listView = new System.Windows.Forms.ListView();
-            this.Datum = new System.Windows.Forms.ColumnHeader();
-            this.Standort = new System.Windows.Forms.ColumnHeader();
-            this.sickdays = new System.Windows.Forms.ColumnHeader();
+            this.Datum = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.Standort = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.sickdays = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.panel1 = new System.Windows.Forms.Panel();
             this.stat_total_pre = new System.Windows.Forms.Label();
             this.label10 = new System.Windows.Forms.Label();
@@ -44,15 +44,15 @@
             this.label5 = new System.Windows.Forms.Label();
             this.label4 = new System.Windows.Forms.Label();
             this.label3 = new System.Windows.Forms.Label();
-            this.bt_vacation = new System.Windows.Forms.Button();
             this.bt_settings = new System.Windows.Forms.Button();
+            this.l_hint = new System.Windows.Forms.Label();
             this.panel1.SuspendLayout();
             this.SuspendLayout();
             // 
             // bt_addEntry
             // 
             this.bt_addEntry.Font = new System.Drawing.Font("Bahnschrift SemiBold", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.bt_addEntry.Location = new System.Drawing.Point(16, 376);
+            this.bt_addEntry.Location = new System.Drawing.Point(16, 380);
             this.bt_addEntry.Name = "bt_addEntry";
             this.bt_addEntry.Size = new System.Drawing.Size(146, 40);
             this.bt_addEntry.TabIndex = 0;
@@ -99,6 +99,7 @@
             // 
             this.panel1.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Center;
             this.panel1.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
+            this.panel1.Controls.Add(this.l_hint);
             this.panel1.Controls.Add(this.stat_total_pre);
             this.panel1.Controls.Add(this.label10);
             this.panel1.Controls.Add(this.stat_total_ho);
@@ -112,7 +113,7 @@
             this.panel1.Location = new System.Drawing.Point(176, 287);
             this.panel1.Name = "panel1";
             this.panel1.RightToLeft = System.Windows.Forms.RightToLeft.No;
-            this.panel1.Size = new System.Drawing.Size(294, 131);
+            this.panel1.Size = new System.Drawing.Size(294, 137);
             this.panel1.TabIndex = 6;
             // 
             // stat_total_pre
@@ -128,7 +129,7 @@
             // label10
             // 
             this.label10.AutoSize = true;
-            this.label10.ForeColor = System.Drawing.Color.Red;
+            this.label10.ForeColor = System.Drawing.Color.Black;
             this.label10.Location = new System.Drawing.Point(213, 69);
             this.label10.Name = "label10";
             this.label10.Size = new System.Drawing.Size(29, 14);
@@ -150,7 +151,7 @@
             // 
             this.label8.AutoSize = true;
             this.label8.Font = new System.Drawing.Font("Bahnschrift SemiBold", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label8.ForeColor = System.Drawing.Color.Red;
+            this.label8.ForeColor = System.Drawing.Color.Black;
             this.label8.Location = new System.Drawing.Point(111, 67);
             this.label8.Name = "label8";
             this.label8.Size = new System.Drawing.Size(31, 14);
@@ -209,22 +210,10 @@
             this.label3.Text = "Gesamt";
             this.label3.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
-            // bt_vacation
-            // 
-            this.bt_vacation.Enabled = false;
-            this.bt_vacation.Font = new System.Drawing.Font("Bahnschrift SemiBold", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.bt_vacation.Location = new System.Drawing.Point(16, 331);
-            this.bt_vacation.Name = "bt_vacation";
-            this.bt_vacation.Size = new System.Drawing.Size(146, 40);
-            this.bt_vacation.TabIndex = 7;
-            this.bt_vacation.Text = "Urlaub eintragen";
-            this.bt_vacation.UseVisualStyleBackColor = true;
-            this.bt_vacation.Click += new System.EventHandler(this.bt_vacation_clicked);
-            // 
             // bt_settings
             // 
             this.bt_settings.Font = new System.Drawing.Font("Bahnschrift SemiBold", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.bt_settings.Location = new System.Drawing.Point(16, 285);
+            this.bt_settings.Location = new System.Drawing.Point(16, 332);
             this.bt_settings.Name = "bt_settings";
             this.bt_settings.Size = new System.Drawing.Size(146, 40);
             this.bt_settings.TabIndex = 10;
@@ -232,13 +221,21 @@
             this.bt_settings.UseVisualStyleBackColor = true;
             this.bt_settings.Click += new System.EventHandler(this.bt_settings_clicked);
             // 
+            // l_hint
+            // 
+            this.l_hint.AutoSize = true;
+            this.l_hint.ForeColor = System.Drawing.Color.Red;
+            this.l_hint.Location = new System.Drawing.Point(20, 109);
+            this.l_hint.Name = "l_hint";
+            this.l_hint.Size = new System.Drawing.Size(0, 14);
+            this.l_hint.TabIndex = 10;
+            // 
             // form_Main
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(486, 436);
             this.Controls.Add(this.bt_settings);
-            this.Controls.Add(this.bt_vacation);
             this.Controls.Add(this.panel1);
             this.Controls.Add(this.listView);
             this.Controls.Add(this.bt_addEntry);
@@ -270,12 +267,12 @@
         private System.Windows.Forms.Label label5;
         private System.Windows.Forms.Label label4;
         private System.Windows.Forms.Label label3;
-        private System.Windows.Forms.Button bt_vacation;
         public System.Windows.Forms.ListView listView;
         private System.Windows.Forms.ColumnHeader Datum;
         private System.Windows.Forms.ColumnHeader Standort;
         private System.Windows.Forms.ColumnHeader sickdays;
         private System.Windows.Forms.Button bt_settings;
+        private System.Windows.Forms.Label l_hint;
     }
 }
 

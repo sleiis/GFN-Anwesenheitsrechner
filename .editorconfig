@@ -1,0 +1,7 @@
+﻿[*.cs]
+
+# S6580: Use a format provider when parsing date and time
+dotnet_diagnostic.S6580.severity = none
+
+# S1104: Fields should not have public accessibility
+dotnet_diagnostic.S1104.severity = none

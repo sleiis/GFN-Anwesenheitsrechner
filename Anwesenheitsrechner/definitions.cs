@@ -1,23 +1,21 @@
-﻿
-
-using System;
+﻿using System;
 using System.Collections;
 using System.Windows.Forms;
 
 
 namespace definitions
 {
+    enum Language
+    {
+        Deutsch,
+        English
+    }
     public struct Settings
     {
-        public int language;
+        public int Language;
     }
-
     public struct Entry
     {
-        public bool isActive;
-        public bool isVacation;
-        public bool isHoliday;
-        public bool isWork;
         public DateTime date;
         public int location;
         public bool sickday;
@@ -25,11 +23,10 @@ namespace definitions
 
     public class ListViewItemColumnSorter : IComparer
     {
-        public int curColumn = 0;
         public int Compare(object x, object y)
         {
-            string a = ((ListViewItem)y).SubItems[curColumn].Text;
-            string b = ((ListViewItem)x).SubItems[curColumn].Text;
+            string a = ((ListViewItem)y).SubItems[0].Text;
+            string b = ((ListViewItem)x).SubItems[0].Text;
 
             return DateTime.Compare(DateTime.Parse(a), DateTime.Parse(b));
         }
