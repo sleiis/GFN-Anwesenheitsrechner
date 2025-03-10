@@ -19,7 +19,7 @@ namespace definitions
         public DateTime date;
         public int location;
         public bool sickday;
-    };
+    }
 
     public class ListViewItemColumnSorter : IComparer
     {

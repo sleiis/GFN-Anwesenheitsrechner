@@ -35,9 +35,6 @@ namespace Anwesenheitsrechner
                 location = rb_pre.Checked ? 0 : rb_ho.Checked ? 1 : -1
             };
 
-            entry.date = mc_dateselect.SelectionStart;
-            entry.sickday = cb_sickday.Checked;
-
             if (edit) mainform.editEntry(entry);
             else mainform.addEntry(entry);
 

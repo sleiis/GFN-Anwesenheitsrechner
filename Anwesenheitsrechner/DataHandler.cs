@@ -14,12 +14,12 @@ namespace Anwesenheitsrechner
 
         public DataHandler()
         {
+            sqlite_conn = CreateConnection();
             initDB();
         }
 
         public NameValueCollection readSQL(string cmd)
         {
-
             try
             {
                 NameValueCollection output;
@@ -42,13 +42,14 @@ namespace Anwesenheitsrechner
             return new NameValueCollection();
         }
 
-        public int writeSQL(string cmd)
+        public int writeSQL(string cmd, params SQLiteParameter[] parameters)
         {
             try
             {
                 using (var sqlite_cmd = sqlite_conn.CreateCommand())
                 {
                     sqlite_cmd.CommandText = cmd;
+                    sqlite_cmd.Parameters.AddRange(parameters);
                     return sqlite_cmd.ExecuteNonQuery();
                 }
             }
@@ -61,8 +62,6 @@ namespace Anwesenheitsrechner
 
         void initDB()
         {
-
-            sqlite_conn = CreateConnection();
             try
             {
                 // Creates Settings Table if it does not exist
@@ -110,8 +109,7 @@ namespace Anwesenheitsrechner
                 using (var sqlite_cmd = sqlite_conn.CreateCommand())
                 {
                     sqlite_cmd.CommandText = "SELECT * FROM Settings;";
-                    SQLiteDataReader sqlite_datareader;
-                    using (sqlite_datareader = sqlite_cmd.ExecuteReader())
+                    using (SQLiteDataReader sqlite_datareader = sqlite_cmd.ExecuteReader())
                     {
                         sqlite_datareader.Read();
                         return new Settings
@@ -125,10 +123,7 @@ namespace Anwesenheitsrechner
             {
                 MessageBox.Show("Fehler beim Lesen der Einstellungen: " + ex.Message, "Fehler", MessageBoxButtons.OK);
             }
-            return new Settings
-            {
-                Language = 0
-            };
+            return new Settings {Language = 0};
         }
 
         public static void clearDB()
