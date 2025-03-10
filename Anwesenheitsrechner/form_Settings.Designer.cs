@@ -144,9 +144,14 @@
             this.Controls.Add(this.tb_websiteparse);
             this.Controls.Add(this.cb_language);
             this.Controls.Add(this.l_language);
+            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
             this.MaximizeBox = false;
+            this.MaximumSize = new System.Drawing.Size(447, 352);
             this.MinimizeBox = false;
+            this.MinimumSize = new System.Drawing.Size(447, 352);
             this.Name = "form_Settings";
+            this.ShowIcon = false;
+            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Einstellungen";
             this.ResumeLayout(false);
             this.PerformLayout();

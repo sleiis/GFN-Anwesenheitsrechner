@@ -34,13 +34,21 @@ namespace Anwesenheitsrechner
 
         public NameValueCollection readSQL(string cmd)
         {
-            sqlite_cmd = sqlite_conn.CreateCommand();
-            sqlite_cmd.CommandText = cmd;
-            sqlite_datareader = sqlite_cmd.ExecuteReader();
-            sqlite_datareader.Read();
-            NameValueCollection output = sqlite_datareader.GetValues();
-            sqlite_datareader.Close();
-            return output;
+            try
+            {
+                sqlite_cmd = sqlite_conn.CreateCommand();
+                sqlite_cmd.CommandText = cmd;
+                sqlite_datareader = sqlite_cmd.ExecuteReader();
+                sqlite_datareader.Read();
+                NameValueCollection output = sqlite_datareader.GetValues();
+                sqlite_datareader.Close();
+                return output;
+            }
+            catch (Exception ex)
+            {
+                DialogResult dialogResult = MessageBox.Show("SQL Fehler: " + ex.Message, "Fehler", MessageBoxButtons.OK);
+                return null;
+            }
         }
 
         public int writeSQL(string cmd)
@@ -63,19 +71,27 @@ namespace Anwesenheitsrechner
         {
 
             sqlite_conn = CreateConnection();
-            // Creates Settings Table if it does not exist
-            writeSQL("Create Table if not exists Settings (name, value);");
-
-            // Creates Data Table if it does not exist
-            writeSQL("Create Table if not exists 'Data' (date date, location varchar(20), sickday bool);");
-
-            // Set default language to German   
-            if (int.Parse(readSQL("Select count(*) From Settings where name='language';").GetValues(0).ElementAt(0)) == 0)
+            try
             {
-                
-                writeSQL("Insert into Settings Values ('language', 'Deutsch');");
+                // Creates Settings Table if it does not exist
+                writeSQL("Create Table if not exists Settings (name, value);");
+
+                // Creates Data Table if it does not exist
+                writeSQL("Create Table if not exists 'Data' (date date, location varchar(20), sickday bool);");
+
+                // Set default language to German   
+                if (int.Parse(readSQL("Select count(*) From Settings where name='language';").GetValues(0).ElementAt(0)) == 0)
+                {
+
+                    writeSQL("Insert into Settings Values ('language', 'Deutsch');");
+                }
+                writeSQL("Delete from Data where date = '' or date is null;");
             }
-            writeSQL("Delete from Data where date = '' or date is null;");
+            catch
+            {
+                DialogResult dialogResult = MessageBox.Show("SQLite Fehler", "Fehler", MessageBoxButtons.OK);
+                Application.Exit();
+            }
         }
 
         SQLiteConnection CreateConnection()
@@ -98,26 +114,21 @@ namespace Anwesenheitsrechner
         {
             SQLiteDataReader sqlite_datareader;
 
-            sqlite_cmd = sqlite_conn.CreateCommand();
-            sqlite_cmd.CommandText = "SELECT * FROM Settings;";
-
-            sqlite_datareader = sqlite_cmd.ExecuteReader();
-            while (sqlite_datareader.Read())
+            try
             {
-                form_Main.settings.language = (int)Enum.Parse(typeof(Language), sqlite_datareader.GetString(1));
+                sqlite_cmd = sqlite_conn.CreateCommand();
+                sqlite_cmd.CommandText = "SELECT * FROM Settings;";
+
+                sqlite_datareader = sqlite_cmd.ExecuteReader();
+                while (sqlite_datareader.Read())
+                {
+                    form_Main.settings.language = (int)Enum.Parse(typeof(Language), sqlite_datareader.GetString(1));
+                }
             }
-        }
-
-        public List<Entry> parseWeb(string input)
-        {
-            List<Entry> output = new List<Entry>();
-
-
-
-
-
-
-            return output;
+            catch (Exception ex)
+            {
+                DialogResult dialogResult = MessageBox.Show("Fehler beim Lesen der Einstellungen: " + ex.Message, "Fehler", MessageBoxButtons.OK);
+            }
         }
 
     }

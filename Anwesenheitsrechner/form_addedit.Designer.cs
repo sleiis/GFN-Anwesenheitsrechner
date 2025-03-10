@@ -135,11 +135,13 @@
             this.Controls.Add(this.bt_add);
             this.Controls.Add(this.label2);
             this.Controls.Add(this.label1);
-            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
+            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
             this.MaximizeBox = false;
+            this.MaximumSize = new System.Drawing.Size(291, 386);
             this.MinimizeBox = false;
+            this.MinimumSize = new System.Drawing.Size(291, 386);
             this.Name = "form_addedit";
-            this.ShowInTaskbar = false;
+            this.ShowIcon = false;
             this.SizeGripStyle = System.Windows.Forms.SizeGripStyle.Hide;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Eintrag hinzufügen";

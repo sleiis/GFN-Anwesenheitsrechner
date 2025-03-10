@@ -31,9 +31,9 @@
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(form_Main));
             this.bt_addEntry = new System.Windows.Forms.Button();
             this.listView = new System.Windows.Forms.ListView();
-            this.Datum = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-            this.Standort = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-            this.sickdays = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.Datum = new System.Windows.Forms.ColumnHeader();
+            this.Standort = new System.Windows.Forms.ColumnHeader();
+            this.sickdays = new System.Windows.Forms.ColumnHeader();
             this.panel1 = new System.Windows.Forms.Panel();
             this.stat_total_pre = new System.Windows.Forms.Label();
             this.label10 = new System.Windows.Forms.Label();
@@ -243,7 +243,11 @@
             this.Controls.Add(this.listView);
             this.Controls.Add(this.bt_addEntry);
             this.Font = new System.Drawing.Font("Bahnschrift SemiBold", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
+            this.MaximizeBox = false;
+            this.MaximumSize = new System.Drawing.Size(502, 475);
+            this.MinimumSize = new System.Drawing.Size(502, 475);
             this.Name = "form_Main";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "GFN Anwesenheitsrechner";

@@ -1,11 +1,9 @@
-﻿using System;
-using System.Collections;
+﻿using definitions;
+using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Linq;
-using System.Threading;
 using System.Windows.Forms;
-using definitions;
 
 
 namespace Anwesenheitsrechner
@@ -39,7 +37,7 @@ namespace Anwesenheitsrechner
             // Read Data from SQL and add to ListView
             for (int i = 0; i < EntryCount; i++)
             {
-                NameValueCollection entry = DataHandler.readSQL("Select Distinct * From Data where rowid=" + (i + 1) + ";");
+                NameValueCollection entry = DataHandler.readSQL($"Select Distinct * From Data where rowid = {i + 1};");
                 String Date = DateTime.Parse(entry.GetValues(0).ElementAt(0)).ToString("D");
                 String location = entry.GetValues(1).ElementAt(0);
                 String sickday = (entry.GetValues(2).ElementAt(0)) == "1" ? "Ja" : "Nein";
@@ -95,7 +93,7 @@ namespace Anwesenheitsrechner
 
                 int index = listView.SelectedItems[0].Index;
                 Form changeEntry = new form_addedit(this, true);
-                MonthCalendar monthCalendar = changeEntry.Controls.Find("mc_selectdate", false)[0] as MonthCalendar;
+                MonthCalendar monthCalendar = changeEntry.Controls.Find("mc_dateselect", false)[0] as MonthCalendar;
                 changeEntry.Text = "Eintrag ändern";
                 changeEntry.Controls.Find("bt_add", false)[0].Text = "Ändern";
 
@@ -216,7 +214,7 @@ namespace Anwesenheitsrechner
             item.SubItems.Add(sickday ? "Ja" : "Nein");
 
             listView.Items.Add(item);
-            DataHandler.writeSQL("Insert Into 'Data' (date,location,sickday) Values ('" + entry.date.ToShortDateString() + "', '" + location + "', " + entry.sickday.ToString() + ");");
+            DataHandler.writeSQL($"Insert Into 'Data' (date,location,sickday) Values (' {entry.date.ToShortDateString()}', '{location}', {entry.sickday.ToString()});");
 
             calculateDayRatio();
             listView.Sort();
@@ -237,7 +235,7 @@ namespace Anwesenheitsrechner
             item.SubItems.Add(entry.sickday ? "Ja" : "Nein");
 
             int x = listView.SelectedItems[0].Index;
-            DataHandler.writeSQL("Update Data Set 'location' = '" + location + "', 'sickday' = " + entry.sickday.ToString() + ", 'date' = '" + entry.date.ToShortDateString() + "' where date = '" + DateTime.Parse(listView.Items[x].Text).ToShortDateString() + "';");
+            DataHandler.writeSQL($"Update Data Set 'location' = '{location}', 'sickday' = {entry.sickday.ToString()}, 'date' = '{ entry.date.ToShortDateString()}' where date = '{DateTime.Parse(listView.Items[x].Text).ToShortDateString()}';");
             listView.Items.RemoveAt(x);
             listView.Items.Insert(x, item);
         }
@@ -247,7 +245,7 @@ namespace Anwesenheitsrechner
             int count = items.Count;
             for (int i = 0; i < count; i++)
             {
-                DataHandler.writeSQL("Delete From Data where date = '" + DateTime.Parse(items[0].Text).ToShortDateString() + "';");
+                DataHandler.writeSQL($"Delete From Data where date = '{DateTime.Parse(items[0].Text).ToShortDateString()}';");
                 listView.Items.Remove(items[0]);
             }
         }

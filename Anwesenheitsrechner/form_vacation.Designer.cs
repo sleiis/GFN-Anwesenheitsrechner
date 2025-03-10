@@ -81,6 +81,8 @@
             this.Controls.Add(this.bt_add);
             this.Controls.Add(this.label1);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
+            this.MaximumSize = new System.Drawing.Size(305, 288);
+            this.MinimumSize = new System.Drawing.Size(305, 288);
             this.Name = "form_vacation";
             this.SizeGripStyle = System.Windows.Forms.SizeGripStyle.Hide;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;

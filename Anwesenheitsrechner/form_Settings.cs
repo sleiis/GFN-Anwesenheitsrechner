@@ -1,13 +1,6 @@
 ﻿using definitions;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Security.Cryptography;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace Anwesenheitsrechner
@@ -43,83 +36,90 @@ namespace Anwesenheitsrechner
             List<String> entries = new List<String>();
             int lastEntry = 0;
 
-            if (rb_web.Checked)
+            try
             {
-                entries.AddRange(tb_websiteparse.Text.Split(new string[] { "\n" }, StringSplitOptions.None));
-                for (int i = 0; i < entries.Count; i++)
+
+                if (rb_web.Checked)
                 {
-                    String date = entries[i].Split(new string[] { "\t" }, StringSplitOptions.None)[0];
-                    String location = entries[i].Split(new string[] { "\t" }, StringSplitOptions.None)[1];
-                    Entry newEntry = new Entry();
-                    newEntry.date = DateTime.Parse(date);
-                    if (location.Contains("🏢"))
+                    entries.AddRange(tb_websiteparse.Text.Split(new string[] { "\n" }, StringSplitOptions.None));
+                    for (int i = 0; i < entries.Count; i++)
                     {
-                        newEntry.location = 0;
-                        newEntry.sickday = false;
+                        String date = entries[i].Split(new string[] { "\t" }, StringSplitOptions.None)[0];
+                        String location = entries[i].Split(new string[] { "\t" }, StringSplitOptions.None)[1];
+                        Entry newEntry = new Entry();
+                        newEntry.date = DateTime.Parse(date);
+                        if (location.Contains("🏢"))
+                        {
+                            newEntry.location = 0;
+                            newEntry.sickday = false;
+                        }
+                        else if (location.Contains("🏠"))
+                        {
+                            newEntry.location = 1;
+                            newEntry.sickday = false;
+                        }
+                        else
+                        {
+                            newEntry.location = -1;
+                            newEntry.sickday = true;
+                        }
+                        output.Add(newEntry);
                     }
-                    else if (location.Contains("🏠"))
-                    {
-                        newEntry.location = 1;
-                        newEntry.sickday = false;
-                    }
-                    else
-                    {
-                        newEntry.location = -1;
-                        newEntry.sickday = true;
-                    }
-                    output.Add(newEntry);
                 }
+
+                if (rb_php.Checked)
+                {
+                    while (lastEntry < (tb_websiteparse.Text.Length - 165))
+                    {
+
+                        int start = tb_websiteparse.Text.IndexOf("<tr>", lastEntry);
+                        int end = tb_websiteparse.Text.IndexOf("</tr>", (lastEntry + 1)) + 5;
+
+                        String entry = tb_websiteparse.Text.Substring(start, 166);
+
+                        lastEntry = end;
+
+                        entries.Add(entry);
+
+                    }
+
+                    for (int i = 0; i < entries.Count; i++)
+                    {
+                        String date = entries[i].Substring(entries[i].IndexOf("<td>"), 14);
+                        String location = entries[i].Substring(entries[i].IndexOf("<td>") + 16, 13);
+
+                        date = date.Replace("<td>", "").Replace("<", "").Trim();
+                        location = location.Replace("<td>", "").Replace("</td>", "").Trim();
+                        Entry newEntry = new Entry();
+                        newEntry.date = DateTime.Parse(date);
+
+                        if (location.Contains("🏢"))
+                        {
+                            newEntry.location = 0;
+                            newEntry.sickday = false;
+                        }
+                        else if (location.Contains("🏠"))
+                        {
+                            newEntry.location = 1;
+                            newEntry.sickday = false;
+                        }
+                        else
+                        {
+                            newEntry.location = -1;
+                            newEntry.sickday = true;
+                        }
+                        output.Add(newEntry);
+
+                    }
+                }
+                mainform.addfromWeb(output);
+                this.Close();
+            }
+            catch
+            {
+                MessageBox.Show("Fehler beim Parsen der Daten");
             }
 
-            if (rb_php.Checked)
-            {
-                while (lastEntry < (tb_websiteparse.Text.Length - 165))
-                {
-
-                    int start = tb_websiteparse.Text.IndexOf("<tr>", lastEntry);
-                    int end = tb_websiteparse.Text.IndexOf("</tr>", (lastEntry + 1)) + 5;
-
-                    String entry = tb_websiteparse.Text.Substring(start, 166);
-
-                    lastEntry = end;
-
-                    entries.Add(entry);
-
-                }
-
-                for (int i = 0; i < entries.Count; i++)
-                {
-                    String date = entries[i].Substring(entries[i].IndexOf("<td>"), 14);
-                    String location = entries[i].Substring(entries[i].IndexOf("<td>") + 16, 13);
-
-                    date = date.Replace("<td>", "").Replace("<", "").Trim();
-                    location = location.Replace("<td>", "").Replace("</td>", "").Trim();
-                    Entry newEntry = new Entry();
-                    newEntry.date = DateTime.Parse(date);
-
-                    if (location.Contains("🏢"))
-                    {
-                        newEntry.location = 0;
-                        newEntry.sickday = false;
-                    }
-                    else if (location.Contains("🏠"))
-                    {
-                        newEntry.location = 1;
-                        newEntry.sickday = false;
-                    }
-                    else
-                    {
-                        newEntry.location = -1;
-                        newEntry.sickday = true;
-                    }
-                    output.Add(newEntry);
-
-                }
-            }
-
-
-            mainform.addfromWeb(output);
-            this.Close();
         }
 
         private void rb_changed(Object sender, System.EventArgs e)
