@@ -1,18 +1,21 @@
 ﻿using definitions;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Windows.Forms;
 
 namespace Anwesenheitsrechner
 {
-    public partial class form_Settings: Form
+    public partial class form_Settings : Form
     {
-        form_Main mainform;
+        private readonly form_Main mainform;
+        private Settings settings;
         public form_Settings(form_Main form_Main)
         {
             InitializeComponent();
-            cb_language.SelectedIndex = form_Main.settings.language;
             mainform = form_Main;
+            settings = form_Main.Settings;
+            cb_language.SelectedIndex = settings.Language;
         }
 
         private void bt_cancel_clicked(object sender, EventArgs e)
@@ -22,12 +25,15 @@ namespace Anwesenheitsrechner
 
         private void bt_save_clicked(object sender, EventArgs e)
         {
-            if (form_Main.settings.language != cb_language.SelectedIndex)
+            if (settings.Language != cb_language.SelectedIndex)
             {
-                form_Main.settings.language = cb_language.SelectedIndex;
+                settings.Language = cb_language.SelectedIndex;
                 this.Close();
             }
-            else { this.Close(); }
+            else
+            {
+                this.Close();
+            }
         }
 
         private void bt_parse_clicked(object sender, EventArgs e)
@@ -46,23 +52,14 @@ namespace Anwesenheitsrechner
                     {
                         String date = entries[i].Split(new string[] { "\t" }, StringSplitOptions.None)[0];
                         String location = entries[i].Split(new string[] { "\t" }, StringSplitOptions.None)[1];
-                        Entry newEntry = new Entry();
-                        newEntry.date = DateTime.Parse(date);
-                        if (location.Contains("🏢"))
+
+                        Entry newEntry = new Entry()
                         {
-                            newEntry.location = 0;
-                            newEntry.sickday = false;
-                        }
-                        else if (location.Contains("🏠"))
-                        {
-                            newEntry.location = 1;
-                            newEntry.sickday = false;
-                        }
-                        else
-                        {
-                            newEntry.location = -1;
-                            newEntry.sickday = true;
-                        }
+                            date = DateTime.Parse(date),
+                            location = location.Contains("🏢") ? 0 : location.Contains("🏠") ? 1 : -1,
+                            sickday = !location.Contains("🏢") && !location.Contains("🏠")
+                        };
+
                         output.Add(newEntry);
                     }
                 }
@@ -90,24 +87,14 @@ namespace Anwesenheitsrechner
 
                         date = date.Replace("<td>", "").Replace("<", "").Trim();
                         location = location.Replace("<td>", "").Replace("</td>", "").Trim();
-                        Entry newEntry = new Entry();
-                        newEntry.date = DateTime.Parse(date);
 
-                        if (location.Contains("🏢"))
+                        Entry newEntry = new Entry()
                         {
-                            newEntry.location = 0;
-                            newEntry.sickday = false;
-                        }
-                        else if (location.Contains("🏠"))
-                        {
-                            newEntry.location = 1;
-                            newEntry.sickday = false;
-                        }
-                        else
-                        {
-                            newEntry.location = -1;
-                            newEntry.sickday = true;
-                        }
+                            date = DateTime.Parse(date),
+                            location = location.Contains("🏢") ? 0 : location.Contains("🏠") ? 1 : -1,
+                            sickday = !location.Contains("🏢") && !location.Contains("🏠")
+                        };
+
                         output.Add(newEntry);
 
                     }
@@ -115,9 +102,9 @@ namespace Anwesenheitsrechner
                 mainform.addfromWeb(output);
                 this.Close();
             }
-            catch
+            catch (Exception ex)
             {
-                MessageBox.Show("Fehler beim Parsen der Daten");
+                MessageBox.Show($"Fehler beim Parsen der Daten: {ex.Message}");
             }
 
         }
@@ -125,6 +112,12 @@ namespace Anwesenheitsrechner
         private void rb_changed(Object sender, System.EventArgs e)
         {
             rb_web.Checked = !rb_php.Checked;
+        }
+
+        private void bt_cleardb_clicked(object sender, EventArgs e)
+        {
+            DataHandler.clearDB();
+            mainform.initListView();
         }
     }
 }
