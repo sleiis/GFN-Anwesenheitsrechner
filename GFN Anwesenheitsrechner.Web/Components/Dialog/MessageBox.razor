@@ -1,0 +1,22 @@
+﻿@inject UserData uData
+<MudDialog>
+    <DialogContent>
+        @uData.MessageBoxString
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="Cancel">Cancel</MudButton>
+        <MudButton Color="Color.Primary" OnClick="Submit">Ok</MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+
+    [CascadingParameter]
+    private IMudDialogInstance? MudDialog { get; set; }
+    // The custom text for the dialog
+
+    private void Submit() => MudDialog!.Close(DialogResult.Ok(true));
+
+    private void Cancel() => MudDialog!.Cancel();
+
+}

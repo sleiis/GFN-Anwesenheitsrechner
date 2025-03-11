@@ -6,10 +6,11 @@
 <MudSnackbarProvider />
 <MudLayout>
     <MudAppBar Elevation="1">
-        <MudText Typo="Typo.h5" Class="ml-3">Application</MudText>
+        <MudIcon Icon="@Icons.Material.Filled.AvTimer" Size="Size.Large" Color="Color.Primary" />
+        <MudText Typo="Typo.h5" Color="Color.Primary" Class="ml-3">GFN Anwesenheitsrechner</MudText>
         <MudSpacer />
-        <MudIconButton Icon="@(DarkLightModeButtonIcon)" Color="Color.Inherit" OnClick="@DarkModeToggle" />
-        <MudIconButton Icon="@Icons.Material.Filled.MoreVert" Color="Color.Inherit" Edge="Edge.End" />
+        <MudIconButton Icon="@(DarkLightModeButtonIcon)" Color="Color.Primary" OnClick="@DarkModeToggle" />
+        <MudIconButton Icon="@Icons.Material.Filled.MoreVert" Color="Color.Primary" Edge="Edge.End" />
     </MudAppBar>
     <MudMainContent Class="mt-16 pa-4">
         @Body
@@ -46,42 +47,32 @@
 
     private readonly PaletteLight _lightPalette = new()
     {
-        Black = "#110e2d",
-        AppbarText = "#424242",
-        AppbarBackground = "rgba(255,255,255,0.8)",
-        DrawerBackground = "#ffffff",
-        GrayLight = "#e8e8e8",
-        GrayLighter = "#f9f9f9",
-    };
+            Primary = "#0366d6", // blue background
+            Secondary = "#f0f2f6", // Lighter background
+            AppbarBackground = "#f2f2f2", // Light appbar
+            Background = "#f7f8fa", // Lighter background
+            Surface = "#ffffff", // Surface white
+            DrawerBackground = "#f7f8fa", // Drawer light
+            TextPrimary = "#222222", // Dark text
+            TextSecondary = "#6a737d", // Gray 
+            ActionDefault = "#222222", // Dark actions
+            Divider = "#d8dce2", // Divider light gray
+
+        };
 
     private readonly PaletteDark _darkPalette = new()
     {
-        Primary = "#7e6fff",
-        Surface = "#1e1e2d",
-        Background = "#1a1a27",
-        BackgroundGray = "#151521",
-        AppbarText = "#92929f",
-        AppbarBackground = "rgba(26,26,39,0.8)",
-        DrawerBackground = "#1a1a27",
-        ActionDefault = "#74718e",
-        ActionDisabled = "#9999994d",
-        ActionDisabledBackground = "#605f6d4d",
-        TextPrimary = "#b2b0bf",
-        TextSecondary = "#92929f",
-        TextDisabled = "#ffffff33",
-        DrawerIcon = "#92929f",
-        DrawerText = "#92929f",
-        GrayLight = "#2a2833",
-        GrayLighter = "#1e1e2d",
-        Info = "#4a86ff",
-        Success = "#3dcb6c",
-        Warning = "#ffb545",
-        Error = "#ff3f5f",
-        LinesDefault = "#33323e",
-        TableLines = "#33323e",
-        Divider = "#292838",
-        OverlayLight = "#1e1e2d80",
-    };
+            Primary = "#0366d6", // blue background
+            Secondary = "#1e242d", // Slightly lighter dark
+            AppbarBackground = "#161b22", // Appbar dark
+            Background = "#12151b", // Background darker
+            Surface = "#21262d", // Card surface dark
+            DrawerBackground = "#12151b", // Drawer dark
+            TextPrimary = "#ffffff", // White text
+            TextSecondary = "#c9cfd7", // Lighter gray text
+            ActionDefault = "#ffffff", // Action buttons white
+            Divider = "#2d333d", // Divider color (light gray)
+        };
 
     public string DarkLightModeButtonIcon => _isDarkMode switch
     {

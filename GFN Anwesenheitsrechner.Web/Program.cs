@@ -1,5 +1,7 @@
 using GFN_Anwesenheitsrechner.Web.Components;
 using GFN_Anwesenheitsrechner.Web.Database;
+using GFN_Anwesenheitsrechner.Web.Extensions;
+using GFN_Anwesenheitsrechner.Web.Lists;
 using MudBlazor.Services;
 
 namespace GFN_Anwesenheitsrechner.Web
@@ -14,11 +16,16 @@ namespace GFN_Anwesenheitsrechner.Web
 
             // Add MudBlazor services
             builder.Services.AddMudServices();
-
+            builder.Services.AddHttpClient();
             // Add services to the container.
             builder.Services.AddRazorComponents()
                 .AddInteractiveServerComponents();
 
+            builder.Services.AddSingleton<SQLQuery>();
+            builder.Services.AddSingleton<PasswordManager>();
+            builder.Services.AddSingleton<ConnectionManager>();
+            builder.Services.AddScoped<UserData>();
+            builder.Services.AddSingleton<UsersList>();
             var app = builder.Build();
 
             // Configure the HTTP request pipeline.

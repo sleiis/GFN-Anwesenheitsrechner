@@ -8,8 +8,8 @@
         // Count total users
         public string COUNT_USERS { get { return "SELECT COUNT(*) FROM UsersList;"; } }
 
-        // Get a user by their ID
-        public string GET_USER_BY_ID { get { return "SELECT * FROM UsersList WHERE UserID = @UserID;"; } }
+        // Get a user by their Username
+        public string GET_USER_BY_USERNAME { get { return "SELECT * FROM UsersList WHERE Username = @Username;"; } }
 
         // Verify user by checking username and password
         public string VERIFIED_USER { get { return "SELECT * FROM UsersList WHERE Username = @Username AND Password = @Password;"; } }
@@ -20,8 +20,7 @@
         // Insert a new presence record
         public string INSERT_PRESENCE { get { return @"
         INSERT INTO PresenceList (UserID, Date, HomeOffice, LoginTime, LogoutTime, CorrectionLogin, CorrectionLogout) 
-        VALUES (@UserID, @Date, @HomeOffice, @LoginTime, @LogoutTime, @CorrectionLogin, @CorrectionLogout);
-    "; } }
+        VALUES (@UserID, @Date, @HomeOffice, @LoginTime, @LogoutTime, @CorrectionLogin, @CorrectionLogout);"; } }
 
         // Delete a presence record by ID
         public string DELETE_PRESENCE { get { return "DELETE FROM PresenceList WHERE PresenceID = @PresenceID;"; } }
@@ -36,8 +35,7 @@
             LogoutTime = @LogoutTime,
             CorrectionLogin = @CorrectionLogin,
             CorrectionLogout = @CorrectionLogout
-        WHERE PresenceID = @PresenceID;
-    "; } }
+        WHERE PresenceID = @PresenceID;"; } }
     }
 
 }

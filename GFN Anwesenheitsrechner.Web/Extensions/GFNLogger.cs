@@ -1,6 +1,4 @@
-﻿
-
-namespace GFN_Anwesenheitsrechner.Web.Extensions
+﻿namespace GFN_Anwesenheitsrechner.Web.Extensions
 {
     public class GFNLogger
     {
