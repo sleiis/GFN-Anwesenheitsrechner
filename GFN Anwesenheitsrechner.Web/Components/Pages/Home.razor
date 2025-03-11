@@ -1,0 +1,83 @@
+﻿@page "/"
+@inject NavigationManager Navigation
+@inject HttpClient httpClient
+@inject UserData _Userdata
+<MudGrid Justify="Justify.Center">
+    <MudDataGrid T="Lists.PresenceList" MultiSelection="true" Items="@Elements" SortMode="SortMode.Multiple" Filterable="true" QuickFilter="@_quickFilter"
+    Hideable="true" RowClick="@RowClicked" RowContextMenuClick="RowRightClicked" SelectedItemsChanged="@SelectedItemsChanged">
+        <ToolBarContent>
+            <MudText Typo="Typo.h6">Periodic Elements</MudText>
+            <MudSpacer />
+            <MudTextField @bind-Value="_searchString" Placeholder="Search" Adornment="Adornment.Start" Immediate="true"
+            AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
+        </ToolBarContent>
+        <Columns>
+            <SelectColumn T="Lists.PresenceList" />
+            <PropertyColumn Property="x => x.Date" Title="Date" />
+            <PropertyColumn Property="x => x.HomeOffice" Title="Home-Office" />
+            <PropertyColumn Property="x => x.LoginTime" Title="Login Time" />
+            <PropertyColumn Property="x => x.LogoutTime" Title="Logout Time" />
+            <PropertyColumn Property="x => x.CorrectionLogin" Title="Correction Login" />
+            <PropertyColumn Property="x => x.CorrectionLogout" Title="Correction Logout" />
+        </Columns>
+        <PagerContent>
+            <MudDataGridPager T="Lists.PresenceList" />
+        </PagerContent>
+    </MudDataGrid>
+</MudGrid>
+@code {
+
+
+
+    private IEnumerable<Lists.PresenceList> Elements = new List<Lists.PresenceList>();
+    private string? _searchString;
+    private List<string> _events = new();
+    public bool Logged { get; set; }
+    // quick filter - filter globally across multiple columns with the same input
+    private Func<Lists.PresenceList, bool> _quickFilter => x =>
+    {
+        if (string.IsNullOrWhiteSpace(_searchString))
+            return true;
+
+        if (x.Date.ToString().Contains(_searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+
+        if ($"{x.Date.ToString()}".Contains(_searchString))
+            return true;
+
+        return false;
+    };
+
+    protected override async Task OnInitializedAsync()
+    {
+        Elements = null;
+    }
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            if (!_Userdata.isLogged)
+            {
+                // Schedule navigation after rendering is complete
+                Navigation.NavigateTo("/SignIn");
+            }
+        }
+    }
+
+    // events
+    void RowClicked(DataGridRowClickEventArgs<Lists.PresenceList> args)
+    {
+        _events.Insert(0, $"Event = RowClick, Index = {args.RowIndex}, Data = {System.Text.Json.JsonSerializer.Serialize(args.Item)}");
+    }
+
+    void RowRightClicked(DataGridRowClickEventArgs<Lists.PresenceList> args)
+    {
+        _events.Insert(0, $"Event = RowRightClick, Index = {args.RowIndex}, Data = {System.Text.Json.JsonSerializer.Serialize(args.Item)}");
+    }
+
+    void SelectedItemsChanged(HashSet<Lists.PresenceList> items)
+    {
+        _events.Insert(0, $"Event = SelectedItemsChanged, Data = {System.Text.Json.JsonSerializer.Serialize(items)}");
+    }
+}
+

@@ -1,0 +1,69 @@
+﻿@page "/SignIn"
+
+@inject PasswordManager psw
+@inject IDialogService Dialog
+@inject UserData uData
+@inject ConnectionManager cMan 
+@inject SQLQuery sql
+<PageTitle>Sign In</PageTitle>
+
+<MudGrid Justify="Justify.Center">
+    <MudItem xs="12" sm="7" md="6" lg="4">
+        <MudPaper Class="pa-4">
+            <MudText Typo="Typo.h4" Align="Align.Center">Bitte Einloggen!</MudText>
+            <MudForm @ref="signInForm" Spacing="3" @bind-IsValid="@_isValidate">
+
+                <!-- Username TextField with Required validation -->
+                <MudTextField @bind-Value="Username" T="string" Label="Benutzername" Required="true" HelperText="Bitte Benutzername eingeben." @onkeydown="OnKeyPress" />
+
+                <!-- Password TextField with Required validation -->
+                <MudTextField @bind-Value="Password" T="string" Label="Passwort" InputType="InputType.Password" Required="true" HelperText="Bitte Passwort eingeben." @onkeydown="OnKeyPress" />
+
+                <!-- Create Account Button -->
+                <MudFab onclick="UserLogin" Color="Color.Primary" Disabled="!_isValidate" Label="Einloggen!" StartIcon="@Icons.Material.Filled.HowToReg"/>
+
+                <!-- Register Button -->
+                <MudFab StartIcon="@Icons.Material.Filled.PersonAddAlt1" Label="Registrieren" Color="Color.Success" Href="/SignUp" />
+            </MudForm>
+        </MudPaper>
+    </MudItem>
+</MudGrid>
+
+@code {
+    private bool _isValidate;
+    private string? Username;
+    private string? Password;
+    private MudForm? signInForm;
+    private readonly DialogOptions _backdropClick = new() { CloseButton=false };
+    private async void UserLogin()
+    {
+        if (!_isValidate)
+        {
+            uData.MessageBoxString = "Bitte geben Sie Ihre Zugangsdaten ein";
+            await Dialog.ShowAsync<MessageBox>("Message", _backdropClick);
+            return; // Return after showing the dialog
+        }
+        var passwordHash = psw.EncryptPassword(Password!);
+        var User = await cMan.LoadDataList<UsersList, dynamic>(sql.VERIFIED_USER, new { Username, Password = passwordHash });
+        if (User.Count != 1)
+        {
+            uData.MessageBoxString = "Falscher Benutzername oder Passwort!";
+            await Dialog.ShowAsync<MessageBox>("Message", _backdropClick);
+            return;
+        }
+        var currentUser = User[0];
+        uData.UserID = currentUser.UserID;
+        uData.UserName = currentUser.Username;
+        uData.isLogged = true;
+    }
+
+    // Handle key press for "Enter"
+    private void OnKeyPress(KeyboardEventArgs e)
+    {
+        if (e.Key == "Enter") // Ensure form is valid before submitting
+        {
+            signInForm.Validate();
+            UserLogin();  // Manually trigger the submission handler
+        }
+    }
+}
