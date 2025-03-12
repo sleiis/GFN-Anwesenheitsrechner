@@ -188,7 +188,7 @@ namespace Anwesenheitsrechner
             {
                 stat_total_ho.ForeColor = System.Drawing.Color.Red;
                 stat_total_pre.ForeColor = System.Drawing.Color.Red;
-                l_hint.Text = $"Verhältnis überschritten um {Math.Ceiling((49 - (double)homeCount) * dayCount / 100).ToString()} Tage";
+                l_hint.Text = $"Verhältnis überschritten um {Math.Round((((double)homeCount * 100 / dayCount) - 49) / 100 * dayCount,2).ToString()} Tage";
             }
             else
             {
