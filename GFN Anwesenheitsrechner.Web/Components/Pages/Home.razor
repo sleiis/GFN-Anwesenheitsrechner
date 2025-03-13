@@ -1,40 +1,60 @@
 ﻿@page "/"
+@inject IDialogService Dialog
 @inject NavigationManager Navigation
 @inject HttpClient httpClient
-@inject UserData _Userdata
-<MudGrid Justify="Justify.Center">
-    <MudDataGrid T="Lists.PresenceList" MultiSelection="true" Items="@Elements" SortMode="SortMode.Multiple" Filterable="true" QuickFilter="@_quickFilter"
-    Hideable="true" RowClick="@RowClicked" RowContextMenuClick="RowRightClicked" SelectedItemsChanged="@SelectedItemsChanged">
-        <ToolBarContent>
-            <MudText Typo="Typo.h6">Periodic Elements</MudText>
-            <MudSpacer />
-            <MudTextField @bind-Value="_searchString" Placeholder="Search" Adornment="Adornment.Start" Immediate="true"
-            AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
-        </ToolBarContent>
-        <Columns>
-            <SelectColumn T="Lists.PresenceList" />
-            <PropertyColumn Property="x => x.Date" Title="Date" />
-            <PropertyColumn Property="x => x.HomeOffice" Title="Home-Office" />
-            <PropertyColumn Property="x => x.LoginTime" Title="Login Time" />
-            <PropertyColumn Property="x => x.LogoutTime" Title="Logout Time" />
-            <PropertyColumn Property="x => x.CorrectionLogin" Title="Correction Login" />
-            <PropertyColumn Property="x => x.CorrectionLogout" Title="Correction Logout" />
-        </Columns>
-        <PagerContent>
-            <MudDataGridPager T="Lists.PresenceList" />
-        </PagerContent>
-    </MudDataGrid>
-</MudGrid>
+@inject ISessionStorageService SessionStorage
+@inject ConnectionManager cMan
+@inject SQLQuery sql
+
+
+<MudTable Items="@Elements" Dense="true" Hover="true" Breakpoint="Breakpoint.Sm" Loading="@_loading" LoadingProgressColor="Color.Info" Striped="true" Filter="new Func<PresenceList,bool>(_quickFilter)" @bind-SelectedItem="_selectedItem"
+Style="overflow-y: auto; margin: auto; margin-top: 20px; max-width:90%;">
+    <ToolBarContent>
+        <MudFab Size="Size.Small" Color="Color.Primary" StartIcon="@Icons.Material.Outlined.Add" OnClick="OpenAddTimeDialog" Style="margin-right: 5px;" ></MudFab>
+        <MudFab Size="Size.Small" Color="Color.Primary" StartIcon="@Icons.Material.Outlined.Refresh" OnClick="RefreshData" Style="margin-right: 5px;"></MudFab>
+        <MudSpacer />
+        <MudText Typo="Typo.h6"> Anwesenheit</MudText>
+        <MudSpacer />
+        <MudTextField @bind-Value="_searchString" Placeholder="Suchen" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
+    </ToolBarContent>
+    <HeaderContent>
+        <MudTh>Date</MudTh>
+        <MudTh>Office</MudTh>
+        <MudTh>Login Time</MudTh>
+        <MudTh>Logout Time</MudTh>
+        <MudTh>Correction Login</MudTh>
+        <MudTh>Correction Logout</MudTh>
+        <MudTh>Bearbeiten</MudTh>
+    </HeaderContent>
+    <RowTemplate>
+        <MudTd DataLabel="Date">@context.Date</MudTd>
+        <MudTd DataLabel="Home-Office">@HomeOffice(context.HomeOffice)</MudTd>
+        <MudTd DataLabel="Login Time">@context.LoginTime.</MudTd>
+        <MudTd DataLabel="Logout Time">@context.LogoutTime.</MudTd>
+        <MudTd DataLabel="Correction Login">@context.CorrectionLogin</MudTd>
+        <MudTd DataLabel="Correction Logout">@context.CorrectionLogout</MudTd>
+        <MudTd DataLabel="Bearbeiten">
+            <MudIconButton OnClick="() => OpenEditPresenceDialog(context)" Icon="@Icons.Material.Outlined.Edit"></MudIconButton>
+            <MudIconButton OnClick="() => OpenDeletePresenceDialog(context.PresenceID)" Icon="@Icons.Material.Outlined.Delete"></MudIconButton>
+        </MudTd>
+    </RowTemplate>
+    <PagerContent>
+        <MudTablePager />
+    </PagerContent>
+</MudTable>
+
 @code {
-
-
-
-    private IEnumerable<Lists.PresenceList> Elements = new List<Lists.PresenceList>();
+    bool _dense;   // makes it a bit more dense
+    bool _loading; // triggers loading animation of the tabel if true
+    PresenceList _selectedItem = null!;
+    private IEnumerable<PresenceList> Elements = new List<PresenceList>();
     private string? _searchString;
     private List<string> _events = new();
-    public bool Logged { get; set; }
+    private SessionCoockiList? LogedInUser;
+    private string? _username;
+    private int _userID;
     // quick filter - filter globally across multiple columns with the same input
-    private Func<Lists.PresenceList, bool> _quickFilter => x =>
+    private Func<PresenceList, bool> _quickFilter => x =>
     {
         if (string.IsNullOrWhiteSpace(_searchString))
             return true;
@@ -47,23 +67,114 @@
 
         return false;
     };
+    private string HomeOffice(bool isHomeOffice)
+    {
+        if(isHomeOffice)
+        {
+            return "🏠";
+        }
+        else
+        {
+            return "🏢";
+        }
+    }
+    private async Task OpenDeletePresenceDialog(int KundenNummer)
+    {
+        var options = new DialogOptions
+            {
+                CloseButton = true,
+                FullWidth = true,
+                CloseOnEscapeKey = true,
+            };
+        // var result = await DialogService.Show<Dialogs.Loeschen>("Kunden Löschen", options).Result;
 
+        // if (result.Data is bool Kundenlöschen && Kundenlöschen)
+        // {
+        //     await DBConn.InsertData<dynamic>(SQL.DELETE_KUNDEN, new
+        //     {
+        //         KundenNummer
+        //     });
+        //     Console.WriteLine($"Deleted ID: {KundenNummer}");
+        //     await LoadKunden();
+        //     StateHasChanged();
+        // }
+        // else
+        // {
+        //     return;
+        // }
+    }
+    private async Task OpenEditPresenceDialog(PresenceList Kunden)
+    {
+        // var parameters = new DialogParameters
+        // {
+        //     {"KundenNummer" , Kunden.KundenNummer},
+        //     { "Name", Kunden.Name},
+        //     { "Vorname", Kunden.Vorname },
+        //     { "Strasse", Kunden.Strasse },
+        //     { "Ort", Kunden.Ort },
+        //     { "PLZ", Kunden.PLZ }
+        // };
+
+        // var options = new DialogOptions
+        //     {
+        //         CloseButton = true,
+        //         FullWidth = true,
+        //         CloseOnEscapeKey = true,
+        //     };
+
+        // var result = await DialogService.Show<Dialogs.KundenBearbeiten>("Kunden Bearbeiten", parameters, options).Result;
+
+        // if (result.Data is bool KundenHinzufügen && KundenHinzufügen)
+        // {
+        //     await LoadKunden();
+        // }
+    }
+    protected override async Task OnParametersSetAsync()
+    {
+        await RefreshData();
+    }
     protected override async Task OnInitializedAsync()
     {
-        Elements = null;
+    }
+    private async Task RefreshData()
+    {
+        _loading = true;
+        StateHasChanged();
+        await Task.Delay(400);
+        Elements = await cMan.LoadDataList<PresenceList, dynamic>(sql.GET_PRESENCE_BY_USERID, new { UserID = _userID });
+        StateHasChanged();
+        _loading = false;
     }
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
         {
-            if (!_Userdata.isLogged)
+            if (await SessionStorage.ContainKeyAsync("UserLogintoken"))
             {
-                // Schedule navigation after rendering is complete
+                // Load the token if it exists
+                LogedInUser = await SessionStorage.GetItemAsync<SessionCoockiList>("UserLogintoken");
+                _username = LogedInUser.Username!;
+                _userID = LogedInUser.UserID;
+
+            }
+            else
+            {
                 Navigation.NavigateTo("/SignIn");
+                return;
             }
         }
     }
+    private async Task  OpenAddTimeDialog()
+    {
+        var options = new DialogOptions
+            {
+                CloseButton = true,
+                FullWidth = true,
+                CloseOnEscapeKey = true,
+            };
+        var result = await Dialog.Show<Dialog.InsertPresence>("AddTime", options).Result;
 
+    }
     // events
     void RowClicked(DataGridRowClickEventArgs<Lists.PresenceList> args)
     {
@@ -80,4 +191,3 @@
         _events.Insert(0, $"Event = SelectedItemsChanged, Data = {System.Text.Json.JsonSerializer.Serialize(items)}");
     }
 }
-

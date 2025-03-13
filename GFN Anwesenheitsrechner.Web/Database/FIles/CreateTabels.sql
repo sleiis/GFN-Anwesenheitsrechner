@@ -11,9 +11,9 @@ CREATE TABLE IF NOT EXISTS PresenceList (
     UserID INTEGER NOT NULL,                        -- Foreign key referencing UsersList
     Date DATE,                                      -- Date of presence record
     HomeOffice INTEGER CHECK (HomeOffice IN (0, 1)) DEFAULT 0, -- Boolean as INTEGER
-    LoginTime DATETIME,                             -- Time of login
-    LogoutTime DATETIME,                            -- Time of logout
-    CorrectionLogin DATETIME,                       -- Nullable corrected login time
-    CorrectionLogout DATETIME,                      -- Nullable corrected logout time
+    LoginTime TIME,                             -- Time of login
+    LogoutTime TIME,                            -- Time of logout
+    CorrectionLogin TIME,                       -- Nullable corrected login time
+    CorrectionLogout TIME,                      -- Nullable corrected logout time
     FOREIGN KEY (UserID) REFERENCES UsersList(UserID) ON DELETE CASCADE -- Cascade delete
 );

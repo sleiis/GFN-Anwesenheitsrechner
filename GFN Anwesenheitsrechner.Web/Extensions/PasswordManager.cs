@@ -4,7 +4,15 @@
     {
         public bool VerifyPassword(string PasswordHash, string Password)
         {
-            return BCrypt.Net.BCrypt.Verify(Password, PasswordHash);
+            try
+            {
+                return BCrypt.Net.BCrypt.Verify(Password, PasswordHash);
+            }
+            catch
+            {
+                return false;
+            }
+            
         }
         public string EncryptPassword(string Password)
         {

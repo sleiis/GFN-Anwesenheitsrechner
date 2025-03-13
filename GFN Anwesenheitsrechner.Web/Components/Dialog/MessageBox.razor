@@ -1,15 +1,18 @@
-﻿@inject UserData uData
+﻿
+@inject IDialogService DialogService
 <MudDialog>
     <DialogContent>
-        @uData.MessageBoxString
+        @MessageString
     </DialogContent>
     <DialogActions>
-        <MudButton OnClick="Cancel">Cancel</MudButton>
-        <MudButton Color="Color.Primary" OnClick="Submit">Ok</MudButton>
+        <MudFab OnClick="Cancel" Label="Cancel"></MudFab>
+        <MudFab Color="Color.Primary" OnClick="Submit" Label="Ok"></MudFab>
     </DialogActions>
 </MudDialog>
-
 @code {
+
+    [Parameter]
+    public required string MessageString { get; set; }
 
     [CascadingParameter]
     private IMudDialogInstance? MudDialog { get; set; }

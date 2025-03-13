@@ -1,10 +1,11 @@
 ﻿@page "/SignIn"
-
+@inject NavigationManager Navi
 @inject PasswordManager psw
 @inject IDialogService Dialog
-@inject UserData uData
+
 @inject ConnectionManager cMan 
 @inject SQLQuery sql
+@inject ISessionStorageService SessionStorage
 <PageTitle>Sign In</PageTitle>
 
 <MudGrid Justify="Justify.Center">
@@ -39,22 +40,32 @@
     {
         if (!_isValidate)
         {
-            uData.MessageBoxString = "Bitte geben Sie Ihre Zugangsdaten ein";
-            await Dialog.ShowAsync<MessageBox>("Message", _backdropClick);
+            var para = new DialogParameters { { "MessageString", "Bitte geben Sie Ihre Zugagsdaten ein" }, };
+            await Dialog.ShowAsync<MessageBox>("Message", para ,_backdropClick);
             return; // Return after showing the dialog
         }
-        var passwordHash = psw.EncryptPassword(Password!);
-        var User = await cMan.LoadDataList<UsersList, dynamic>(sql.VERIFIED_USER, new { Username, Password = passwordHash });
-        if (User.Count != 1)
+        //get the password hash
+        var PasswordHash = await cMan.LoadDataType<string, dynamic>(sql.VERIFIED_USER, new { Username });
+        //check the hash
+        var UserVerify = psw.VerifyPassword(PasswordHash, Password!);
+        //break if false
+        if (!UserVerify)
         {
-            uData.MessageBoxString = "Falscher Benutzername oder Passwort!";
-            await Dialog.ShowAsync<MessageBox>("Message", _backdropClick);
+            var para = new DialogParameters { { "MessageString", "Falscher Benutzername oder Passwort!" }, };
+            await Dialog.ShowAsync<MessageBox>("Message",para ,_backdropClick);
             return;
         }
-        var currentUser = User[0];
-        uData.UserID = currentUser.UserID;
-        uData.UserName = currentUser.Username;
-        uData.isLogged = true;
+        var Users = await cMan.LoadDataList<UsersList, dynamic>(sql.GET_USER_BY_USERNAME, new { Username });
+
+        var UserToken = new SessionCoockiList
+        {
+                UserID = Users[0].UserID,
+                Username = Users[0].Username
+        };
+
+        Navi.NavigateTo("/");
+        // Store token in sessionStorage
+        await SessionStorage.SetItemAsync("UserLogintoken", UserToken);
     }
 
     // Handle key press for "Enter"
@@ -62,7 +73,7 @@
     {
         if (e.Key == "Enter") // Ensure form is valid before submitting
         {
-            signInForm.Validate();
+            signInForm!.Validate();
             UserLogin();  // Manually trigger the submission handler
         }
     }
