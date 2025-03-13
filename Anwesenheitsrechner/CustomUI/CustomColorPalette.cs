@@ -8,89 +8,133 @@ using System.Windows.Forms;
 
 namespace Anwesenheitsrechner.CustomUI
 {
+    /// <summary>
+    /// Custom color palette control for displaying a set of predefined colors.
+    /// </summary>
     public class CustomColorPalette : Control
     {
         private int W;
         private int H;
 
-        protected override void OnResize( EventArgs e )
-        {
-            base.OnResize( e );
-            Width = 180;
-            Height = 80;
-        }
-
-        [Category( "Colors" )]
-        public Color Red { get; set; } = Color.FromArgb( 220, 85, 96 );
-
-        [Category( "Colors" )]
-        public Color Cyan { get; set; } = Color.FromArgb( 10, 154, 157 );
-
-        [Category( "Colors" )]
-        public Color Blue { get; set; } = Color.FromArgb( 0, 128, 255 );
-
-        [Category( "Colors" )]
-        public Color LimeGreen { get; set; } = Color.FromArgb( 22, 96, 253 );
-
-        [Category( "Colors" )]
-        public Color Orange { get; set; } = Color.FromArgb( 253, 181, 63 );
-
-        [Category( "Colors" )]
-        public Color Purple { get; set; } = Color.FromArgb( 155, 88, 181 );
-
-        [Category( "Colors" )]
-        public Color Black { get; set; } = Color.FromArgb( 24, 22, 43 );
-
-        [Category( "Colors" )]
-        public Color Gray { get; set; } = Color.FromArgb( 63, 70, 73 );
-
-        [Category( "Colors" )]
-        public Color White { get; set; } = Helpers.FlatWhite;
-
+        /// <summary>
+        /// Initializes a new instance of the <see cref="CustomColorPalette"/> class.
+        /// </summary>
         public CustomColorPalette()
         {
             SetStyle(
                 ControlStyles.AllPaintingInWmPaint | ControlStyles.UserPaint | ControlStyles.ResizeRedraw |
-                ControlStyles.OptimizedDoubleBuffer, true );
+                ControlStyles.OptimizedDoubleBuffer, true);
             DoubleBuffered = true;
-            BackColor = Color.FromArgb( 35, 30, 59 );
-            Size = new Size( 160, 80 );
-            Font = new Font( "Tahoma", 12 );
+            BackColor = Color.FromArgb(35, 30, 59);
+            Size = new Size(160, 80);
+            Font = new Font("Tahoma", 12);
         }
 
-        protected override void OnPaint( PaintEventArgs e )
+        /// <summary>
+        /// Handles the resize event.
+        /// </summary>
+        /// <param name="e">The event arguments.</param>
+        protected override void OnResize(EventArgs e)
         {
-            var B = new Bitmap( Width, Height );
-            var G = Graphics.FromImage( B );
-            W = Width - 1;
-            H = Height - 1;
+            base.OnResize(e);
+            Width = 180;
+            Height = 80;
+        }
 
-            var _with6 = G;
-            _with6.SmoothingMode = SmoothingMode.HighQuality;
-            _with6.PixelOffsetMode = PixelOffsetMode.HighQuality;
-            _with6.TextRenderingHint = TextRenderingHint.ClearTypeGridFit;
-            _with6.Clear( BackColor );
+        /// <summary>
+        /// Gets or sets the red color in the palette.
+        /// </summary>
+        [Category("Colors")]
+        public Color Red { get; set; } = Color.FromArgb(220, 85, 96);
 
-            //-- Colors 
-            _with6.FillRectangle( new SolidBrush( Red ), new Rectangle( 0, 0, 20, 40 ) );
-            _with6.FillRectangle( new SolidBrush( Cyan ), new Rectangle( 20, 0, 20, 40 ) );
-            _with6.FillRectangle( new SolidBrush( Blue ), new Rectangle( 40, 0, 20, 40 ) );
-            _with6.FillRectangle( new SolidBrush( LimeGreen ), new Rectangle( 60, 0, 20, 40 ) );
-            _with6.FillRectangle( new SolidBrush( Orange ), new Rectangle( 80, 0, 20, 40 ) );
-            _with6.FillRectangle( new SolidBrush( Purple ), new Rectangle( 100, 0, 20, 40 ) );
-            _with6.FillRectangle( new SolidBrush( Black ), new Rectangle( 120, 0, 20, 40 ) );
-            _with6.FillRectangle( new SolidBrush( Gray ), new Rectangle( 140, 0, 20, 40 ) );
-            _with6.FillRectangle( new SolidBrush( White ), new Rectangle( 160, 0, 20, 40 ) );
+        /// <summary>
+        /// Gets or sets the cyan color in the palette.
+        /// </summary>
+        [Category("Colors")]
+        public Color Cyan { get; set; } = Color.FromArgb(10, 154, 157);
 
-            //-- Text
-            _with6.DrawString( "Color Palette", Font, new SolidBrush( White ), new Rectangle( 0, 22, W, H ),
-                Helpers.CenterSF );
+        /// <summary>
+        /// Gets or sets the blue color in the palette.
+        /// </summary>
+        [Category("Colors")]
+        public Color Blue { get; set; } = Color.FromArgb(0, 128, 255);
 
-            base.OnPaint( e );
-            G.Dispose();
-            e.Graphics.InterpolationMode = InterpolationMode.HighQualityBicubic;
-            e.Graphics.DrawImageUnscaled( B, 0, 0 );
-            B.Dispose();
+        /// <summary>
+        /// Gets or sets the lime green color in the palette.
+        /// </summary>
+        [Category("Colors")]
+        public Color LimeGreen { get; set; } = Color.FromArgb(22, 96, 253);
+
+        /// <summary>
+        /// Gets or sets the orange color in the palette.
+        /// </summary>
+        [Category("Colors")]
+        public Color Orange { get; set; } = Color.FromArgb(253, 181, 63);
+
+        /// <summary>
+        /// Gets or sets the purple color in the palette.
+        /// </summary>
+        [Category("Colors")]
+        public Color Purple { get; set; } = Color.FromArgb(155, 88, 181);
+
+        /// <summary>
+        /// Gets or sets the black color in the palette.
+        /// </summary>
+        [Category("Colors")]
+        public Color Black { get; set; } = Color.FromArgb(24, 22, 43);
+
+        /// <summary>
+        /// Gets or sets the gray color in the palette.
+        /// </summary>
+        [Category("Colors")]
+        public Color Gray { get; set; } = Color.FromArgb(63, 70, 73);
+
+        /// <summary>
+        /// Gets or sets the white color in the palette.
+        /// </summary>
+        [Category("Colors")]
+        public Color White { get; set; } = Helpers.FlatWhite;
+
+        /// <summary>
+        /// Paints the color palette control.
+        /// </summary>
+        /// <param name="e">The paint event arguments.</param>
+        protected override void OnPaint(PaintEventArgs e)
+        {
+            using (var B = new Bitmap(Width, Height))
+            using (var G = Graphics.FromImage(B))
+            {
+                W = Width - 1;
+                H = Height - 1;
+
+                G.SmoothingMode = SmoothingMode.HighQuality;
+                G.PixelOffsetMode = PixelOffsetMode.HighQuality;
+                G.TextRenderingHint = TextRenderingHint.ClearTypeGridFit;
+                G.Clear(BackColor);
+
+                // Draw color rectangles
+                DrawColorRectangles(G);
+
+                // Draw text
+                G.DrawString("Color Palette", Font, new SolidBrush(White), new Rectangle(0, 22, W, H), Helpers.CenterSF);
+
+                base.OnPaint(e);
+                e.Graphics.InterpolationMode = InterpolationMode.HighQualityBicubic;
+                e.Graphics.DrawImageUnscaled(B, 0, 0);
+            }
+        }
+
+        /// <summary>
+        /// Draws the color rectangles in the palette.
+        /// </summary>
+        /// <param name="G">The graphics object.</param>
+        private void DrawColorRectangles(Graphics G)
+        {
+            var colors = new[] { Red, Cyan, Blue, LimeGreen, Orange, Purple, Black, Gray, White };
+            for (int i = 0; i < colors.Length; i++)
+            {
+                G.FillRectangle(new SolidBrush(colors[i]), new Rectangle(i * 20, 0, 20, 40));
+            }
         }
     }
 }

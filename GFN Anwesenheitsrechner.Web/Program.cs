@@ -1,3 +1,4 @@
+using Blazored.SessionStorage;
 using GFN_Anwesenheitsrechner.Web.Components;
 using GFN_Anwesenheitsrechner.Web.Database;
 using GFN_Anwesenheitsrechner.Web.Extensions;
@@ -13,7 +14,7 @@ namespace GFN_Anwesenheitsrechner.Web
             SQLitePCL.Batteries.Init();
             ConnectionManager.CreateDatabase();
             var builder = WebApplication.CreateBuilder(args);
-
+            builder.Services.AddBlazoredSessionStorage(); //sesion cookies
             // Add MudBlazor services
             builder.Services.AddMudServices();
             builder.Services.AddHttpClient();
@@ -24,7 +25,7 @@ namespace GFN_Anwesenheitsrechner.Web
             builder.Services.AddSingleton<SQLQuery>();
             builder.Services.AddSingleton<PasswordManager>();
             builder.Services.AddSingleton<ConnectionManager>();
-            builder.Services.AddScoped<UserData>();
+            builder.Services.AddScoped<PresenecManager>();
             builder.Services.AddSingleton<UsersList>();
             var app = builder.Build();
 

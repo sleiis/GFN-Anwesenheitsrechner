@@ -8,96 +8,131 @@ using System.Windows.Forms;
 
 namespace Anwesenheitsrechner.CustomUI
 {
+    /// <summary>
+    /// Custom status bar control with advanced features such as custom colors and optional time/date display.
+    /// </summary>
     public class CustomStatusBar : Control
     {
         private int W;
         private int H;
 
+        /// <summary>
+        /// Gets or sets the base color of the status bar.
+        /// </summary>
+        [Category("Colors")]
+        public Color BaseColor { get; set; } = Color.FromArgb(24, 22, 43);
+
+        /// <summary>
+        /// Gets or sets the text color of the status bar.
+        /// </summary>
+        [Category("Colors")]
+        public Color TextColor { get; set; } = Color.White;
+
+        /// <summary>
+        /// Gets or sets the rectangle color of the status bar.
+        /// </summary>
+        [Category("Colors")]
+        public Color RectColor { get; set; } = Helpers.FlatColor;
+
+        /// <summary>
+        /// Gets or sets a value indicating whether to show the time and date.
+        /// </summary>
+        public bool ShowTimeDate { get; set; } = false;
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="CustomStatusBar"/> class.
+        /// </summary>
+        public CustomStatusBar()
+        {
+            SetStyle(
+                ControlStyles.AllPaintingInWmPaint | ControlStyles.UserPaint | ControlStyles.ResizeRedraw |
+                ControlStyles.OptimizedDoubleBuffer, true);
+            DoubleBuffered = true;
+            Font = new Font("Tahoma", 8);
+            ForeColor = Color.White;
+            Size = new Size(Width, 20);
+        }
+
+        /// <summary>
+        /// Handles the creation of the control to set the dock style.
+        /// </summary>
         protected override void CreateHandle()
         {
             base.CreateHandle();
             Dock = DockStyle.Bottom;
         }
 
-        protected override void OnTextChanged( EventArgs e )
+        /// <summary>
+        /// Handles the text changed event.
+        /// </summary>
+        /// <param name="e">The event arguments.</param>
+        protected override void OnTextChanged(EventArgs e)
         {
-            base.OnTextChanged( e );
+            base.OnTextChanged(e);
             Invalidate();
         }
 
-        [Category( "Colors" )]
-        public Color BaseColor { get; set; } = Color.FromArgb( 24, 22, 43 );
-
-        [Category( "Colors" )]
-        public Color TextColor { get; set; } = Color.White;
-
-        [Category( "Colors" )]
-        public Color RectColor { get; set; } = Helpers.FlatColor;
-
-        public bool ShowTimeDate { get; set; } = false;
-
+        /// <summary>
+        /// Gets the current time and date as a string.
+        /// </summary>
+        /// <returns>The current time and date.</returns>
         public string GetTimeDate()
         {
-            return DateTime.Now.Date + " " + DateTime.Now.Hour + ":" + DateTime.Now.Minute;
+            return DateTime.Now.ToString("yyyy-MM-dd HH:mm");
         }
 
-        public CustomStatusBar()
-        {
-            SetStyle(
-                ControlStyles.AllPaintingInWmPaint | ControlStyles.UserPaint | ControlStyles.ResizeRedraw |
-                ControlStyles.OptimizedDoubleBuffer, true );
-            DoubleBuffered = true;
-            Font = new Font( "Tahoma", 8 );
-            ForeColor = Color.White;
-            Size = new Size( Width, 20 );
-        }
-
-        protected override void OnPaint( PaintEventArgs e )
+        /// <summary>
+        /// Paints the status bar control.
+        /// </summary>
+        /// <param name="e">The paint event arguments.</param>
+        protected override void OnPaint(PaintEventArgs e)
         {
             UpdateColors();
 
-            var B = new Bitmap( Width, Height );
-            var G = Graphics.FromImage( B );
-            W = Width;
-            H = Height;
+            using (var B = new Bitmap(Width, Height))
+            using (var G = Graphics.FromImage(B))
+            {
+                W = Width;
+                H = Height;
 
-            var Base = new Rectangle( 0, 0, W, H );
+                var Base = new Rectangle(0, 0, W, H);
 
-            var _with21 = G;
-            _with21.SmoothingMode = SmoothingMode.HighQuality;
-            _with21.PixelOffsetMode = PixelOffsetMode.HighQuality;
-            _with21.TextRenderingHint = TextRenderingHint.ClearTypeGridFit;
-            _with21.Clear( BaseColor );
+                G.SmoothingMode = SmoothingMode.HighQuality;
+                G.PixelOffsetMode = PixelOffsetMode.HighQuality;
+                G.TextRenderingHint = TextRenderingHint.ClearTypeGridFit;
+                G.Clear(BaseColor);
 
-            //-- Base
-            _with21.FillRectangle( new SolidBrush( BaseColor ), Base );
+                // Draw base
+                G.FillRectangle(new SolidBrush(BaseColor), Base);
 
-            //-- Text
-            _with21.DrawString( Text, Font, Brushes.White, new Rectangle( 10, 4, W, H ), Helpers.NearSF );
+                // Draw text
+                G.DrawString(Text, Font, Brushes.White, new Rectangle(10, 4, W, H), Helpers.NearSF);
 
-            //-- Rectangle
-            _with21.FillRectangle( new SolidBrush( RectColor ), new Rectangle( 4, 4, 4, 14 ) );
+                // Draw rectangle
+                G.FillRectangle(new SolidBrush(RectColor), new Rectangle(4, 4, 4, 14));
 
-            //-- TimeDate
-            if ( ShowTimeDate )
-                _with21.DrawString( GetTimeDate(), Font, new SolidBrush( TextColor ), new Rectangle( -4, 2, W, H ),
-                    new StringFormat
+                // Draw time/date
+                if (ShowTimeDate)
+                {
+                    G.DrawString(GetTimeDate(), Font, new SolidBrush(TextColor), new Rectangle(-4, 2, W, H), new StringFormat
                     {
                         Alignment = StringAlignment.Far,
                         LineAlignment = StringAlignment.Center
-                    } );
+                    });
+                }
 
-            base.OnPaint( e );
-            G.Dispose();
-            e.Graphics.InterpolationMode = InterpolationMode.HighQualityBicubic;
-            e.Graphics.DrawImageUnscaled( B, 0, 0 );
-            B.Dispose();
+                base.OnPaint(e);
+                e.Graphics.InterpolationMode = InterpolationMode.HighQualityBicubic;
+                e.Graphics.DrawImageUnscaled(B, 0, 0);
+            }
         }
 
+        /// <summary>
+        /// Updates the colors of the status bar based on the parent control.
+        /// </summary>
         private void UpdateColors()
         {
-            var colors = Helpers.GetColors( this );
-
+            var colors = Helpers.GetColors(this);
             RectColor = colors.Flat;
         }
     }

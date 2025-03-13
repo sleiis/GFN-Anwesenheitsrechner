@@ -1,60 +1,83 @@
-﻿using definitions;
+﻿using Anwesenheitsrechner.CustomUI;
+using definitions;
 using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
-using System.Linq;
+using System.Globalization;
 using System.Windows.Forms;
+
 
 namespace Anwesenheitsrechner
 {
     public partial class form_Main : Form
     {
-        public static Settings settings;
+        public Settings Settings;
         ContextMenuStrip ListContext = new ContextMenuStrip();
         DataHandler DataHandler = new DataHandler();
 
         public form_Main()
         {
-            DataHandler.readSettings();
+            Settings = DataHandler.readSettings();
             InitializeComponent();
-            initDataGridView();
-        }
 
-        // Setup Functions
-        private void initDataGridView()
-        {
-            // Setup DataGridView Context Menu
+            // Setup ListView Context Menu
             ListContext.Items.Add("bearbeiten").Name = "edit";
             ListContext.Items.Add("löschen").Name = "delete";
             ListContext.Opening += ContexListHandler;
             ListContext.ItemClicked += new ToolStripItemClickedEventHandler(this.ListContext_clicked);
             listView.ContextMenuStrip = ListContext;
 
-            int EntryCount = int.Parse(DataHandler.readSQL("Select count(*) From Data;").GetValues(0).ElementAt(0));
+            initListView();
 
-            // Read Data from SQL and add to DataGridView
-            for (int i = 0; i < EntryCount; i++)
+        }
+
+        // Setup Functions
+        public void initListView()
+        {
+
+            listView.Items.Clear();
+            int count_entries = int.Parse(DataHandler.readSQL("Select count(*) From Data;").GetValues(0)[0]);
+
+            // Read Data from SQL and add to ListView
+            for (int i = 0; i < count_entries; i++)
             {
-                NameValueCollection entry = DataHandler.readSQL($"Select * From Data where rowid = {i + 1};");
-                string Date = DateTime.Parse(entry.GetValues(0).ElementAt(0)).ToString("D");
-                string location = entry.GetValues(1).ElementAt(0);
-                string sickday = (entry.GetValues(2).ElementAt(0)) == "1" ? "Ja" : "Nein";
+                NameValueCollection entry = DataHandler.readSQL($"Select Distinct * From Data where rowid = {(i + 1).ToString()};");
 
-                listView.Rows.Add(Date, location, sickday);
+                
+                ListViewItem.ListViewSubItem sickday = new ListViewItem.ListViewSubItem()
+                {
+                    Text = ((entry.GetValues(2)[0] == "1") ? "Ja" : "Nein")
+                };
+                
+                var location = new ListViewItem.ListViewSubItem()
+                {
+                    Text = entry.GetValues(1)[0]
+                };
+                
+                var item = new ListViewItem()
+                {
+                    Text = DateTime.Parse(entry.GetValues(0)[0]).ToString("D"),
+                    SubItems = { location, sickday }
+                };
+
+                listView.Items.Add(item);
             }
 
             calculateDayRatio();
 
-            // Init Column Sorter (Optional)
-            listView.Sort(listView.Columns[0], System.ComponentModel.ListSortDirection.Ascending);
+            // Init Column Sorter and Sort
+            ListViewItemColumnSorter columnSorter = new ListViewItemColumnSorter();
+            listView.ListViewItemSorter = columnSorter;
+            listView.Sort();
+
+            listView.Columns[0].AutoResize(ColumnHeaderAutoResizeStyle.ColumnContent);
+            listView.Columns[1].AutoResize(ColumnHeaderAutoResizeStyle.ColumnContent);
+
+
         }
 
+
         // Event Functions
-        private void bt_vacation_clicked(object sender, EventArgs e)
-        {
-            Form EntryHolidayForm = new form_vacation(this);
-            EntryHolidayForm.Show();
-        }
 
         private void bt_settings_clicked(object sender, EventArgs e)
         {
@@ -62,66 +85,66 @@ namespace Anwesenheitsrechner
             SettingsForm.Show();
         }
 
-        private void bt_addEntry_clicked(object sender, EventArgs e)
+        private void bt_addEntry_clicked(object sender, System.EventArgs e)
         {
             Form EntryWorkForm = new form_addedit(this, false);
             EntryWorkForm.Show();
+
         }
 
         private void ListContext_clicked(object sender, ToolStripItemClickedEventArgs e)
         {
-            ContextMenuStrip item = sender as ContextMenuStrip;
-            ToolStripItemClickedEventArgs args = e as ToolStripItemClickedEventArgs;
+
+            ToolStripItemClickedEventArgs args = e;
 
             if (args.ClickedItem.Name == "edit")
             {
-                if (listView.SelectedRows.Count > 0)  // Ensure at least one row is selected
+
+                Form changeEntry = new form_addedit(this, true);
+                MonthCalendar monthCalendar = changeEntry.Controls.Find("mc_dateselect", false)[0] as MonthCalendar;
+                changeEntry.Text = "Eintrag ändern";
+                changeEntry.Controls.Find("bt_add", false)[0].Text = "Ändern";
+
+                if (listView.SelectedItems[0].SubItems[1].Text == "Standort")
                 {
-                    int index = listView.SelectedRows[0].Index;
-                    Form changeEntry = new form_addedit(this, true);
-                    MonthCalendar monthCalendar = changeEntry.Controls.Find("mc_dateselect", false)[0] as MonthCalendar;
-                    changeEntry.Text = "Eintrag ändern";
-                    changeEntry.Controls.Find("bt_add", false)[0].Text = "Ändern";
-
-                    // Populate form based on selected data
-                    DataGridViewRow selectedRow = listView.Rows[index];
-                    if (selectedRow.Cells[1].Value.ToString() == "Standort")
-                    {
-                        changeEntry.Controls.Find("rb_pre", false)[0].Select();
-                    }
-                    else if (selectedRow.Cells[1].Value.ToString() == "Homeoffice")
-                    {
-                        changeEntry.Controls.Find("rb_ho", false)[0].Select();
-                    }
-                    else if (selectedRow.Cells[2].Value.ToString() == "Ja")
-                    {
-                        changeEntry.Controls.Find("cb_sickday", false)[0].Select();
-                        changeEntry.Controls.Find("rb_pre", false)[0].Enabled = false;
-                        changeEntry.Controls.Find("rb_ho", false)[0].Enabled = false;
-                    }
-
-                    monthCalendar.ShowTodayCircle = false;
-                    monthCalendar.SelectionStart = DateTime.Parse(selectedRow.Cells[0].Value.ToString());
-                    monthCalendar.SelectionEnd = DateTime.Parse(selectedRow.Cells[0].Value.ToString());
-                    changeEntry.Show();
+                    changeEntry.Controls.Find("rb_pre", false)[0].Select();
                 }
+                else if (listView.SelectedItems[0].SubItems[1].Text == "Homeoffice")
+                {
+                    changeEntry.Controls.Find("rb_ho", false)[0].Select();
+                }
+                else if (listView.SelectedItems[0].SubItems[2].Text == "Ja")
+                {
+                    changeEntry.Controls.Find("cb_sickday", false)[0].Select();
+                    changeEntry.Controls.Find("rb_pre", false)[0].Enabled = false;
+                    changeEntry.Controls.Find("rb_ho", false)[0].Enabled = false;
+                }
+
+                monthCalendar.ShowTodayCircle = false;
+                monthCalendar.SelectionStart = monthCalendar.SelectionEnd = DateTime.Parse(listView.SelectedItems[0].Text);
+                changeEntry.Show();
+
             }
 
             if (args.ClickedItem.Name == "delete")
             {
-                deleteEntry(listView.SelectedRows);
+                deleteEntry(listView.SelectedItems);
                 calculateDayRatio();
             }
+
+
+
         }
 
         private void ContexListHandler(object sender, EventArgs e)
         {
-            if (listView.SelectedRows.Count == 0)
+
+            if (listView.SelectedItems.Count == 0)
             {
                 ListContext.Items[0].Enabled = false;
                 ListContext.Items[1].Enabled = false;
             }
-            else if (listView.SelectedRows.Count == 1)
+            else if (listView.SelectedItems.Count == 1)
             {
                 ListContext.Items[0].Enabled = true;
                 ListContext.Items[1].Enabled = true;
@@ -131,65 +154,71 @@ namespace Anwesenheitsrechner
                 ListContext.Items[0].Enabled = false;
                 ListContext.Items[1].Enabled = true;
             }
+
         }
 
-        // Custom Dialog
-        private void myDialog(string text)
-        {
-            Form dialog = new Form();
-            Label label = new Label();
-            label.Text = text;
-            label.AutoSize = true;
-            dialog.Controls.Add(label);
-            dialog.ShowDialog();
-        }
-
-        // Logic Functions
+        //Logic Functions
         private void calculateDayRatio()
         {
             int dayCount = 0;
             int homeCount = 0;
             int workCount = 0;
 
-            foreach (DataGridViewRow row in listView.Rows)
+            foreach (ListViewItem item in listView.Items)
             {
-                if (row.Cells[1].Value.ToString() == "Standort")
+                if (item.SubItems[1].Text == "Standort")
                 {
                     workCount++;
                     dayCount++;
                 }
-                if (row.Cells[1].Value.ToString() == "Homeoffice")
+                if (item.SubItems[1].Text == "Homeoffice")
                 {
                     homeCount++;
                     dayCount++;
                 }
             }
 
+            double homeRatio = Math.Round((double)homeCount * 100 / dayCount, 2);
+            double workRatio = Math.Round((double)workCount * 100 / dayCount, 2);
+
             if (dayCount == 0) return;
-            if (homeCount > 0) stat_total_ho.Text = (Math.Round((float)homeCount * 100 / dayCount, 2)) + "%";
-            if (workCount > 0) stat_total_pre.Text = (Math.Round((float)workCount * 100 / dayCount, 2)) + "%";
+            if (homeCount > 0) stat_total_ho.Text = $"{homeRatio.ToString()} %";
+            if (workCount > 0) stat_total_pre.Text = $"{workRatio.ToString()} %";
+
+            if (homeRatio > 49 && workRatio < 51)
+            {
+                stat_total_ho.ForeColor = System.Drawing.Color.Red;
+                stat_total_pre.ForeColor = System.Drawing.Color.Red;
+                l_hint.Text = $"Verhältnis überschritten um {Math.Ceiling((49 - (double)homeCount) * dayCount / 100).ToString()} Tage";
+            }
+            else
+            {
+                stat_total_ho.ForeColor = System.Drawing.Color.Green;
+                stat_total_pre.ForeColor = System.Drawing.Color.Green;
+                l_hint.Text = "";
+            }
         }
 
         public void addEntry(Entry entry)
         {
-            string Date = entry.date.ToString("D");
-            // Check for duplicate
-            foreach (DataGridViewRow row in listView.Rows)
+            String date = entry.date.ToString("D");
+            if (listView.Items.ContainsKey(date))
             {
-                if (row.Cells[0].Value.ToString() == Date)
-                {
-                    MessageBox.Show("Datum existiert bereits", "Duplikat", MessageBoxButtons.OK);
-                    return;
-                }
+                MessageBox.Show("Datum existiert bereits", "Duplikat", MessageBoxButtons.OK);
+                return;
             }
 
-            string location = (entry.location == 0) ? "Standort" : "Homeoffice";
+            String location = (entry.location == 0) ? "Standort" : "Homeoffice";
+
             if (entry.sickday) location = "--";
 
-            listView.Rows.Add(Date, location, entry.sickday ? "Ja" : "Nein");
+            var item = new ListViewItem(date)
+            {
+                Name = date
+            };
+            item.SubItems.Add(location);
+            item.SubItems.Add(entry.sickday ? "Ja" : "Nein");
 
-
-            // Insert into SQL database
             listView.Items.Add(item);
             DataHandler.writeSQL("INSERT INTO Data (date, location, sickday) VALUES (@date, @location, @sickday)",
                 new System.Data.SQLite.SQLiteParameter("@date", entry.date.ToShortDateString()),
@@ -197,46 +226,51 @@ namespace Anwesenheitsrechner
                 new System.Data.SQLite.SQLiteParameter("@sickday", entry.sickday.ToString()));
 
             calculateDayRatio();
+            listView.Sort();
         }
 
         public void editEntry(Entry entry)
         {
-            string Date = entry.date.ToString("D");
-            string location = (entry.location == 0) ? "Standort" : "Homeoffice";
+            String date = entry.date.ToString("D");
+            String location = (entry.location == 0) ? "Standort" : "Homeoffice";
+
             if (entry.sickday) location = "--";
 
-            int index = listView.SelectedRows[0].Index;
+            var item = new ListViewItem(date)
+            {
+                Name = date
+            };
+            item.SubItems.Add(location);
+            item.SubItems.Add(entry.sickday ? "Ja" : "Nein");
 
-            // Update selected row
-            listView.Rows[index].Cells[0].Value = Date;
-            listView.Rows[index].Cells[1].Value = location;
-            listView.Rows[index].Cells[2].Value = entry.sickday ? "Ja" : "Nein";
-
-            // Update in the database
-            DataHandler.writeSQL($"Update Data Set location = '{location}', sickday = {entry.sickday.ToString()}, date = '{entry.date.ToShortDateString()}' where date = '{DateTime.Parse(listView.Rows[index].Cells[0].Value.ToString()).ToShortDateString()}';");
+            int index = listView.SelectedItems[0].Index;
+            DataHandler.writeSQL($"Update Data Set 'location' = '{location}', 'sickday' = {entry.sickday.ToString()}, 'date' = '{entry.date.ToShortDateString()}' where date = '{DateTime.Parse(listView.Items[index].Text).ToShortDateString()}';");
+            listView.Items.RemoveAt(index);
+            listView.Items.Insert(index, item);
         }
 
-        public void deleteEntry(DataGridViewSelectedRowCollection rows)
+        public void deleteEntry(ListView.SelectedListViewItemCollection items)
         {
-            foreach (DataGridViewRow row in rows)
+            int count = items.Count;
+            for (int i = 0; i < count; i++)
             {
-                string date = row.Cells[0].Value.ToString();
-                DataHandler.writeSQL($"Delete From Data where date = '{DateTime.Parse(date).ToShortDateString()}';");
-                listView.Rows.Remove(row);
+                DataHandler.writeSQL($"Delete From Data where date = '{DateTime.Parse(items[0].Text).ToShortDateString()}';");
+                listView.Items.Remove(items[0]);
             }
         }
 
         public void addfromWeb(List<Entry> entries)
         {
+            // Parse Web
             foreach (Entry entry in entries)
             {
                 addEntry(entry);
             }
+
+            listView.Columns[0].AutoResize(ColumnHeaderAutoResizeStyle.ColumnContent);
+            listView.Columns[1].AutoResize(ColumnHeaderAutoResizeStyle.ColumnContent);
         }
 
-        private void form_Main_Load(object sender, EventArgs e)
-        {
-            // Code to handle form load if required
-        }
     }
+
 }

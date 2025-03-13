@@ -1,18 +1,19 @@
 ﻿@page "/SignUp"
 @inject PasswordManager psw
 @inject IDialogService Dialog
-@inject UserData uData
 @inject ConnectionManager cMan
 @inject SQLQuery sql
+@inject NavigationManager Navi
+
 <MudGrid Justify="Justify.Center">
     <MudItem xs="12" sm="7" md="6" lg="4">
         <MudPaper Class="pa-4">
             <MudText Typo="Typo.h4" Align="Align.Center">Bitte Registrieren</MudText>
             <MudForm @ref="signInForm" Spacing="3" @bind-IsValid="@_isValidate">
-                <MudTextField T="string" Label="Benutzername" Required="true" @onkeydown="OnKeyPress" />
-                <MudTextField T="string" Label="Passwort" Required="true" HelperText="Wählen Sie ein sicheres Passwort" InputType="InputType.Password" @onkeydown="OnKeyPress" />
-                <MudTextField T="string" Label="Passwort" Required="true" HelperText="Wiederholen Sie das Passwort" InputType="InputType.Password" @onkeydown="OnKeyPress" />
-                <MudFab StartIcon="@Icons.Material.Filled.PersonAddAlt1" Label="Registrieren" Color="Color.Success" @onkeydown="OnKeyPress" />
+                <MudTextField T="string" @bind-Value="Username" Label="Benutzername" Required="true" @onkeydown="OnKeyPress" />
+                <MudTextField T="string" @bind-Value="Password" Label="Passwort" Required="true" HelperText="Wählen Sie ein sicheres Passwort" InputType="InputType.Password" @onkeydown="OnKeyPress" />
+                <MudTextField T="string" @bind-Value="RePassword" Label="Passwort" Required="true" HelperText="Wiederholen Sie das Passwort" InputType="InputType.Password" @onkeydown="OnKeyPress" />
+                <MudFab StartIcon="@Icons.Material.Filled.PersonAddAlt1" Label="Registrieren" Color="Color.Success" OnClick="UserSignUP" />
             </MudForm>
         </MudPaper>
     </MudItem>
@@ -22,23 +23,30 @@
     private bool _isValidate;
     private string? Username;
     private string? Password;
+    private string? RePassword;
     private MudForm? signInForm;
     private readonly DialogOptions _backdropClick = new() { CloseButton = false };
 
-    private async void UserLogin()
+    private async void UserSignUP()
     {
         if (!_isValidate)
         {
-            uData.MessageBoxString = "Bitte geben Sie Ihre Zugangsdaten ein";
-            await Dialog.ShowAsync<MessageBox>("Message", _backdropClick);
+            var para = new DialogParameters { { "MessageString", "Bitte geben Sie Ihre Zugangsdaten ein" }, };
+            await Dialog.ShowAsync<MessageBox>("Fehler!", para, _backdropClick);
             return; // Return after showing the dialog
         }
+        if (!Password!.Contains(RePassword!)){
+            var para = new DialogParameters { { "MessageString", "Das eingegebene Passwort stimt nicht überein" }, };
+            await Dialog.ShowAsync<MessageBox>("Fehler", para, _backdropClick);
+            return;
+        }
+
         var passwordHash = psw.EncryptPassword(Password!);
         var UserExists = await cMan.LoadDataType<bool, dynamic>(sql.GET_USER_BY_USERNAME, new { Username });
         if (UserExists)
         {
-            uData.MessageBoxString = "Benutzername existiert bereits";
-            await Dialog.ShowAsync<MessageBox>("Message", _backdropClick);
+            var para = new DialogParameters { { "MessageString", "Benutzername existiert bereits" }, };
+            await Dialog.ShowAsync<MessageBox>("Fehler",para, _backdropClick);
             return;
         }
         await cMan.SaveData<dynamic>(sql.CREATE_USER, new
@@ -46,8 +54,9 @@
             Username = Username,
             Password = passwordHash
         });
-        uData.MessageBoxString = "Konto erfolgreich erstellt!";
-        await Dialog.ShowAsync<MessageBox>("Message", _backdropClick);
+
+
+        Navi.NavigateTo("/SignIn");
     }
 
     // Handle key press for "Enter"
@@ -55,8 +64,8 @@
     {
         if (e.Key == "Enter") // Ensure form is valid before submitting
         {
-            signInForm.Validate();
-            UserLogin();  // Manually trigger the submission handler
+            signInForm!.Validate();
+            UserSignUP();  // Manually trigger the submission handler
         }
     }
 

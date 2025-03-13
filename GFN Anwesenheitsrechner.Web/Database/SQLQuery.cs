@@ -12,7 +12,7 @@
         public string GET_USER_BY_USERNAME { get { return "SELECT * FROM UsersList WHERE Username = @Username;"; } }
 
         // Verify user by checking username and password
-        public string VERIFIED_USER { get { return "SELECT * FROM UsersList WHERE Username = @Username AND Password = @Password;"; } }
+        public string VERIFIED_USER { get { return "SELECT Password FROM UsersList WHERE Username = @Username"; } }
 
         // Get presence records for a specific user
         public string GET_PRESENCE_BY_USERID { get { return "SELECT * FROM PresenceList WHERE UserID = @UserID;"; } }

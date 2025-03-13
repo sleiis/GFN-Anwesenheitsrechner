@@ -1,0 +1,38 @@
+﻿@page "/Test"
+@inject IDialogService DialogService
+
+<MudTabs Elevation="2" Rounded="true" ApplyEffectsToContainer="true" PanelClass="pa-6">
+    <MudTabPanel Text="Item One" ToolTip="ToolTip One">
+        <MudTextField @bind-Value="InputText" Label="Enter text" Lines="5" Variant="Variant.Outlined" Multiline="true" />
+    </MudTabPanel>
+
+    <MudTabPanel Text="Item Two" ToolTip="ToolTip Two">
+
+
+    </MudTabPanel>
+
+
+
+    <MudFab Size="Size.Small" OnClick="Cancel" Label="Cancel"></MudFab>
+    <MudFab Size="Size.Small" Color="Color.Primary" OnClick="Submit" Label="Ok"></MudFab>
+
+</MudTabs>
+@code {
+    private string InputText = "";
+    private List<string> Lines = new();
+
+    private void ProcessLines()
+    {
+        Lines = InputText.Split(Environment.NewLine, StringSplitOptions.RemoveEmptyEntries).ToList();
+    }
+    [CascadingParameter]
+    private IMudDialogInstance? MudDialog { get; set; }
+
+
+    private async void Submit()
+    {
+        ProcessLines();
+
+    }
+    private void Cancel() => MudDialog!.Cancel();
+}
