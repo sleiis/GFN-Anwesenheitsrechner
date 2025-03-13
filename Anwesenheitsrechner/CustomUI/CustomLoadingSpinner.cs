@@ -1,34 +1,56 @@
 ﻿using System;
+using System.ComponentModel;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Windows.Forms;
 
 namespace Anwesenheitsrechner.CustomUI
 {
+    /// <summary>
+    /// Custom loading spinner control with animated segments.
+    /// </summary>
     public class CustomLoadingSpinner : Control
     {
-        private System.Windows.Forms.Timer timer;
+        private readonly Timer timer;
         private int angle = 0;
-        private int numberOfSegments = 12;
+        private const int NumberOfSegments = 12;
 
+        /// <summary>
+        /// Gets or sets the base color of the spinner.
+        /// </summary>
+        [Category("Colors")]
+        public Color BaseColor { get; set; } = Color.Gray;
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="CustomLoadingSpinner"/> class.
+        /// </summary>
         public CustomLoadingSpinner()
         {
             // Set the control size
-            this.Size = new Size(100, 100);
+            Size = new Size(100, 100);
 
             // Initialize the animation timer
-            timer = new Timer()
+            timer = new Timer
             {
                 Interval = 50 // Adjust speed (lower = faster)
             };
-            timer.Tick += (s, e) =>
-            {
-                angle = (angle + 30) % 360; // Rotate the spinner
-                this.Invalidate(); // Redraw the control
-            };
+            timer.Tick += Timer_Tick;
             timer.Start();
-
         }
+
+        /// <summary>
+        /// Handles the timer tick event to update the spinner angle and redraw the control.
+        /// </summary>
+        private void Timer_Tick(object sender, EventArgs e)
+        {
+            angle = (angle + 30) % 360; // Rotate the spinner
+            Invalidate(); // Redraw the control
+        }
+
+        /// <summary>
+        /// Paints the loading spinner control.
+        /// </summary>
+        /// <param name="e">The paint event arguments.</param>
         protected override void OnPaint(PaintEventArgs e)
         {
             base.OnPaint(e);
@@ -38,13 +60,13 @@ namespace Anwesenheitsrechner.CustomUI
             float centerY = Height / 2f;
             float radius = Math.Min(centerX, centerY) - 10;
 
-            for (int i = 0; i < numberOfSegments; i++)
+            for (int i = 0; i < NumberOfSegments; i++)
             {
-                int alpha = (int)(255 * (i + 1) / (float)numberOfSegments);
-                Color color = Color.FromArgb(alpha, Color.Gray);
+                int alpha = (int)(255 * (i + 1) / (float)NumberOfSegments);
+                Color color = Color.FromArgb(alpha, BaseColor);
                 using (Pen pen = new Pen(color, 4))
                 {
-                    float angleStep = (360f / numberOfSegments) * i;
+                    float angleStep = (360f / NumberOfSegments) * i;
                     float startAngle = angle + angleStep;
                     float x1 = centerX + (float)Math.Cos(startAngle * Math.PI / 180) * radius;
                     float y1 = centerY + (float)Math.Sin(startAngle * Math.PI / 180) * radius;

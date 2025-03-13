@@ -8,131 +8,156 @@ using System.Windows.Forms;
 
 namespace Anwesenheitsrechner.CustomUI
 {
+    /// <summary>
+    /// Custom close button control for closing a form or the application.
+    /// </summary>
     public class CustomClose : Control
     {
-
         private MouseState State = MouseState.None;
         private int x;
-        //Properties
-        private Form _form; 
-        [Category("1 CustomButton Advance")]
-        public Form Form
-        {
-            get { return _form; }
-            set
-            {
-                _form = value;
-            }
-        }
-        protected override void OnMouseEnter( EventArgs e )
-        {
-            base.OnMouseEnter( e );
-            State = MouseState.Over;
-            Invalidate();
-        }
 
-        protected override void OnMouseDown( MouseEventArgs e )
-        {
-            base.OnMouseDown( e );
-            State = MouseState.Down;
-            Invalidate();
-        }
+        /// <summary>
+        /// Gets or sets the base color of the close button.
+        /// </summary>
+        [Category("Colors")]
+        public Color BaseColor { get; set; } = Color.FromArgb(24, 22, 43);
 
-        protected override void OnMouseLeave( EventArgs e )
-        {
-            base.OnMouseLeave( e );
-            State = MouseState.None;
-            Invalidate();
-        }
+        /// <summary>
+        /// Gets or sets the text color of the close button.
+        /// </summary>
+        [Category("Colors")]
+        public Color TextColor { get; set; } = Color.FromArgb(233, 95, 98);
 
-        protected override void OnMouseUp( MouseEventArgs e )
-        {
-            base.OnMouseUp( e );
-            State = MouseState.Over;
-            Invalidate();
-        }
-
-        protected override void OnMouseMove( MouseEventArgs e )
-        {
-            base.OnMouseMove( e );
-            x = e.X;
-            Invalidate();
-        }
-
-        protected override void OnClick( EventArgs e )
-        {
-            base.OnClick( e );
-            if (_form != null && !_form.IsDisposed)  // Check if the form is assigned and not disposed
-            {
-                _form.Close();
-            }
-            else
-            {
-                Environment.Exit( 0 );
-            }
-        }
-
-        protected override void OnResize( EventArgs e )
-        {
-            base.OnResize( e );
-            Size = new Size( 18, 18 );
-        }
-
-        [Category( "Colors" )]
-        public Color BaseColor { get; set; } = Color.FromArgb( 24, 22, 43 );
-
-        [Category( "Colors" )]
-        public Color TextColor { get; set; } = Color.FromArgb( 233, 95, 98 );
-
+        /// <summary>
+        /// Initializes a new instance of the <see cref="CustomClose"/> class.
+        /// </summary>
         public CustomClose()
         {
             SetStyle(
                 ControlStyles.AllPaintingInWmPaint | ControlStyles.UserPaint | ControlStyles.ResizeRedraw |
-                ControlStyles.OptimizedDoubleBuffer, true );
+                ControlStyles.OptimizedDoubleBuffer, true);
             DoubleBuffered = true;
             BackColor = Color.White;
-            Size = new Size( 18, 18 );
+            Size = new Size(10, 10);
             Anchor = AnchorStyles.Top | AnchorStyles.Right;
-            Font = new Font( "Marlett", 14 );
+            Font = new Font("Marlett", 14);
         }
 
-        protected override void OnPaint( PaintEventArgs e )
+        /// <summary>
+        /// Handles the mouse enter event.
+        /// </summary>
+        /// <param name="e">The event arguments.</param>
+        protected override void OnMouseEnter(EventArgs e)
         {
-            var B = new Bitmap( Width, Height );
-            var G = Graphics.FromImage( B );
+            base.OnMouseEnter(e);
+            State = MouseState.Over;
+            Invalidate();
+        }
 
-            var Base = new Rectangle( 0, 0, Width, Height );
+        /// <summary>
+        /// Handles the mouse down event.
+        /// </summary>
+        /// <param name="e">The mouse event arguments.</param>
+        protected override void OnMouseDown(MouseEventArgs e)
+        {
+            base.OnMouseDown(e);
+            State = MouseState.Down;
+            Invalidate();
+        }
 
-            var _with3 = G;
-            _with3.SmoothingMode = SmoothingMode.HighQuality;
-            _with3.PixelOffsetMode = PixelOffsetMode.HighQuality;
-            _with3.TextRenderingHint = TextRenderingHint.ClearTypeGridFit;
-            _with3.Clear( BackColor );
+        /// <summary>
+        /// Handles the mouse leave event.
+        /// </summary>
+        /// <param name="e">The event arguments.</param>
+        protected override void OnMouseLeave(EventArgs e)
+        {
+            base.OnMouseLeave(e);
+            State = MouseState.None;
+            Invalidate();
+        }
 
-            //-- Base
-            _with3.FillRectangle( new SolidBrush( BaseColor ), Base );
+        /// <summary>
+        /// Handles the mouse up event.
+        /// </summary>
+        /// <param name="e">The mouse event arguments.</param>
+        protected override void OnMouseUp(MouseEventArgs e)
+        {
+            base.OnMouseUp(e);
+            State = MouseState.Over;
+            Invalidate();
+        }
 
-            //-- X
-            _with3.DrawString( "i", Font, new SolidBrush( TextColor ), new Rectangle( 0, 0, Width, Height ),
-                Helpers.CenterSF );
+        /// <summary>
+        /// Handles the mouse move event.
+        /// </summary>
+        /// <param name="e">The mouse event arguments.</param>
+        protected override void OnMouseMove(MouseEventArgs e)
+        {
+            base.OnMouseMove(e);
+            x = e.X;
+            Invalidate();
+        }
 
-            //--Hover / down
-            switch ( State )
+        /// <summary>
+        /// Handles the click event.
+        /// </summary>
+        /// <param name="e">The event arguments.</param>
+        protected override void OnClick(EventArgs e)
+        {
+            base.OnClick(e);
+            var form = FindForm();
+            form.Close();
+        }
+
+        /// <summary>
+        /// Handles the resize event.
+        /// </summary>
+        /// <param name="e">The event arguments.</param>
+        protected override void OnResize(EventArgs e)
+        {
+            base.OnResize(e);
+            Size = new Size(10, 10);
+        }
+
+        /// <summary>
+        /// Paints the close button control.
+        /// </summary>
+        /// <param name="e">The paint event arguments.</param>
+        protected override void OnPaint(PaintEventArgs e)
+        {
+            using (var B = new Bitmap(Width, Height))
+            using (var G = Graphics.FromImage(B))
             {
-                case MouseState.Over:
-                    _with3.FillRectangle( new SolidBrush( Color.FromArgb( 30, Color.White ) ), Base );
-                    break;
+                var Base = new Rectangle(0, 0, Width, Height);
 
-                case MouseState.Down:
-                    _with3.FillRectangle( new SolidBrush( Color.FromArgb( 30, Color.Black ) ), Base );
-                    break;
+                G.SmoothingMode = SmoothingMode.HighQuality;
+                G.PixelOffsetMode = PixelOffsetMode.HighQuality;
+                G.TextRenderingHint = TextRenderingHint.ClearTypeGridFit;
+                G.Clear(BackColor);
+
+                // Base
+                G.FillRectangle(new SolidBrush(BaseColor), Base);
+
+                // Red dot
+                var dotSize = Math.Min(Width, Height);
+                var dotRect = new Rectangle((Width - dotSize) / 2, (Height - dotSize) / 2, dotSize, dotSize);
+                G.FillEllipse(new SolidBrush(TextColor), dotRect);
+
+                // Hover / down
+                switch (State)
+                {
+                    case MouseState.Over:
+                        G.FillRectangle(new SolidBrush(Color.FromArgb(30, Color.White)), Base);
+                        break;
+                    case MouseState.Down:
+                        G.FillRectangle(new SolidBrush(Color.FromArgb(30, Color.Black)), Base);
+                        break;
+                }
+
+                base.OnPaint(e);
+                e.Graphics.InterpolationMode = InterpolationMode.HighQualityBicubic;
+                e.Graphics.DrawImageUnscaled(B, 0, 0);
             }
-
-            base.OnPaint( e );
-            G.Dispose();
-            e.Graphics.InterpolationMode = InterpolationMode.HighQualityBicubic;
-            e.Graphics.DrawImageUnscaled( B, 0, 0 );
-            B.Dispose();
         }
     }
 }

@@ -5,138 +5,137 @@ using System.Drawing;
 
 namespace Anwesenheitsrechner.CustomUI
 {
+    /// <summary>
+    /// Custom toggle button control with advanced features such as custom colors and styles.
+    /// </summary>
     public class CustomToggleButton : CheckBox
     {
-        //Fields
+        // Fields
         private Color onBackColor = Color.MediumSlateBlue;
         private Color onToggleColor = Color.WhiteSmoke;
         private Color offBackColor = Color.Gray;
         private Color offToggleColor = Color.Gainsboro;
         private bool solidStyle = true;
-        //Properties
+
+        // Properties
         [Category("1 CustomToggleButton Advance")]
         public Color OnBackColor
         {
-            get
-            {
-                return onBackColor;
-            }
+            get => onBackColor;
             set
             {
                 onBackColor = value;
-                this.Invalidate();
+                Invalidate(); // Redraw the control when the color changes
             }
         }
 
         [Category("1 CustomToggleButton Advance")]
         public Color OnToggleColor
         {
-            get
-            {
-                return onToggleColor;
-            }
+            get => onToggleColor;
             set
             {
                 onToggleColor = value;
-                this.Invalidate();
+                Invalidate(); // Redraw the control when the color changes
             }
         }
 
         [Category("1 CustomToggleButton Advance")]
         public Color OffBackColor
         {
-            get
-            {
-                return offBackColor;
-            }
+            get => offBackColor;
             set
             {
                 offBackColor = value;
-                this.Invalidate();
+                Invalidate(); // Redraw the control when the color changes
             }
         }
 
         [Category("1 CustomToggleButton Advance")]
         public Color OffToggleColor
         {
-            get
-            {
-                return offToggleColor;
-            }
+            get => offToggleColor;
             set
             {
                 offToggleColor = value;
-                Invalidate();
+                Invalidate(); // Redraw the control when the color changes
             }
         }
+
         [Browsable(false)]
         public override string Text
         {
-            get
-            {
-                return base.Text;
-            }
-            set
-            {
-                base.Text = value;
-            }
+            get => base.Text;
+            set => base.Text = value;
         }
+
         [Category("1 CustomToggleButton Advance")]
         [DefaultValue(true)]
         public bool SolidStyle
         {
-            get
-            {
-                return solidStyle;
-            }
-
+            get => solidStyle;
             set
             {
                 solidStyle = value;
-                this.Invalidate();
+                Invalidate(); // Redraw the control when the style changes
             }
         }
-        //Constructor
+
+        // Constructor
         public CustomToggleButton()
         {
-            this.MinimumSize = new Size(45, 22);
+            MinimumSize = new Size(45, 22);
         }
-        //Methods
+
+        // Methods
+        /// <summary>
+        /// Gets the graphics path for the toggle button.
+        /// </summary>
+        /// <returns>The graphics path.</returns>
         private GraphicsPath GetFigurePath()
         {
-            int arcSize = this.Height - 1;
+            int arcSize = Height - 1;
             Rectangle leftArc = new Rectangle(0, 0, arcSize, arcSize);
-            Rectangle rightArc = new Rectangle(this.Width - arcSize - 2, 0, arcSize, arcSize);
+            Rectangle rightArc = new Rectangle(Width - arcSize - 2, 0, arcSize, arcSize);
             GraphicsPath path = new GraphicsPath();
             path.StartFigure();
             path.AddArc(leftArc, 90, 180);
             path.AddArc(rightArc, 270, 180);
             path.CloseFigure();
-
             return path;
         }
+
+        /// <summary>
+        /// Paints the toggle button control.
+        /// </summary>
+        /// <param name="pevent">The paint event arguments.</param>
         protected override void OnPaint(PaintEventArgs pevent)
         {
-            int toggleSize = this.Height - 5;
+            int toggleSize = Height - 5;
             pevent.Graphics.SmoothingMode = SmoothingMode.AntiAlias;
-            pevent.Graphics.Clear(this.Parent.BackColor);
-            if (this.Checked) //ON
+            pevent.Graphics.Clear(Parent.BackColor);
+
+            if (Checked) // ON
             {
-                //Draw the control surface
+                // Draw the control surface
                 if (solidStyle)
                     pevent.Graphics.FillPath(new SolidBrush(onBackColor), GetFigurePath());
-                else pevent.Graphics.DrawPath(new Pen(onBackColor, 2), GetFigurePath());
-                //Draw the toggle
+                else
+                    pevent.Graphics.DrawPath(new Pen(onBackColor, 2), GetFigurePath());
+
+                // Draw the toggle
                 pevent.Graphics.FillEllipse(new SolidBrush(onToggleColor),
-                    new Rectangle(this.Width - this.Height + 1, 2, toggleSize, toggleSize));
+                    new Rectangle(Width - Height + 1, 2, toggleSize, toggleSize));
             }
-            else //OFF
+            else // OFF
             {
-                //Draw the control surface
+                // Draw the control surface
                 if (solidStyle)
                     pevent.Graphics.FillPath(new SolidBrush(offBackColor), GetFigurePath());
-                else pevent.Graphics.DrawPath(new Pen(offBackColor, 2), GetFigurePath());
-                //Draw the toggle
+                else
+                    pevent.Graphics.DrawPath(new Pen(offBackColor, 2), GetFigurePath());
+
+                // Draw the toggle
                 pevent.Graphics.FillEllipse(new SolidBrush(offToggleColor),
                     new Rectangle(2, 2, toggleSize, toggleSize));
             }

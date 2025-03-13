@@ -8,130 +8,157 @@ using System.Windows.Forms;
 
 namespace Anwesenheitsrechner.CustomUI
 {
+    /// <summary>
+    /// Custom control for maximizing and restoring the window state.
+    /// </summary>
     public class CustomMax : Control
     {
         private MouseState State = MouseState.None;
         private int x;
 
-        protected override void OnMouseEnter( EventArgs e )
-        {
-            base.OnMouseEnter( e );
-            State = MouseState.Over;
-            Invalidate();
-        }
+        /// <summary>
+        /// Gets or sets the base color of the control.
+        /// </summary>
+        [Category("Colors")]
+        public Color BaseColor { get; set; } = Color.FromArgb(24, 22, 43);
 
-        protected override void OnMouseDown( MouseEventArgs e )
-        {
-            base.OnMouseDown( e );
-            State = MouseState.Down;
-            Invalidate();
-        }
+        /// <summary>
+        /// Gets or sets the text color of the control.
+        /// </summary>
+        [Category("Colors")]
+        public Color TextColor { get; set; } = Color.FromArgb(48, 190, 69);
 
-        protected override void OnMouseLeave( EventArgs e )
-        {
-            base.OnMouseLeave( e );
-            State = MouseState.None;
-            Invalidate();
-        }
-
-        protected override void OnMouseUp( MouseEventArgs e )
-        {
-            base.OnMouseUp( e );
-            State = MouseState.Over;
-            Invalidate();
-        }
-
-        protected override void OnMouseMove( MouseEventArgs e )
-        {
-            base.OnMouseMove( e );
-            x = e.X;
-            Invalidate();
-        }
-
-        protected override void OnClick( EventArgs e )
-        {
-            base.OnClick( e );
-            switch ( FindForm().WindowState )
-            {
-                case FormWindowState.Maximized:
-                    FindForm().WindowState = FormWindowState.Normal;
-                    break;
-
-                case FormWindowState.Normal:
-                    FindForm().WindowState = FormWindowState.Maximized;
-                    break;
-            }
-        }
-
-        [Category( "Colors" )]
-        public Color BaseColor { get; set; } = Color.FromArgb( 24, 22, 43 );
-
-        [Category( "Colors" )]
-        public Color TextColor { get; set; } = Color.FromArgb( 48, 190, 69 );
-
-        protected override void OnResize( EventArgs e )
-        {
-            base.OnResize( e );
-            Size = new Size( 18, 18 );
-        }
-
+        /// <summary>
+        /// Initializes a new instance of the <see cref="CustomMax"/> class.
+        /// </summary>
         public CustomMax()
         {
             SetStyle(
                 ControlStyles.AllPaintingInWmPaint | ControlStyles.UserPaint | ControlStyles.ResizeRedraw |
-                ControlStyles.OptimizedDoubleBuffer, true );
+                ControlStyles.OptimizedDoubleBuffer, true);
             DoubleBuffered = true;
             BackColor = Color.White;
-            Size = new Size( 18, 18 );
+            Size = new Size(10, 10);
             Anchor = AnchorStyles.Top | AnchorStyles.Right;
-            Font = new Font( "Marlett", 14 );
+            Font = new Font("Marlett", 14);
         }
 
-        protected override void OnPaint( PaintEventArgs e )
+        /// <summary>
+        /// Handles the mouse enter event.
+        /// </summary>
+        /// <param name="e">The event arguments.</param>
+        protected override void OnMouseEnter(EventArgs e)
         {
-            var B = new Bitmap( Width, Height );
-            var G = Graphics.FromImage( B );
+            base.OnMouseEnter(e);
+            State = MouseState.Over;
+            Invalidate();
+        }
 
-            var Base = new Rectangle( 0, 0, Width, Height );
+        /// <summary>
+        /// Handles the mouse down event.
+        /// </summary>
+        /// <param name="e">The mouse event arguments.</param>
+        protected override void OnMouseDown(MouseEventArgs e)
+        {
+            base.OnMouseDown(e);
+            State = MouseState.Down;
+            Invalidate();
+        }
 
-            var _with4 = G;
-            _with4.SmoothingMode = SmoothingMode.HighQuality;
-            _with4.PixelOffsetMode = PixelOffsetMode.HighQuality;
-            _with4.TextRenderingHint = TextRenderingHint.ClearTypeGridFit;
-            _with4.Clear( BackColor );
+        /// <summary>
+        /// Handles the mouse leave event.
+        /// </summary>
+        /// <param name="e">The event arguments.</param>
+        protected override void OnMouseLeave(EventArgs e)
+        {
+            base.OnMouseLeave(e);
+            State = MouseState.None;
+            Invalidate();
+        }
 
-            //-- Base
-            _with4.FillRectangle( new SolidBrush( BaseColor ), Base );
+        /// <summary>
+        /// Handles the mouse up event.
+        /// </summary>
+        /// <param name="e">The mouse event arguments.</param>
+        protected override void OnMouseUp(MouseEventArgs e)
+        {
+            base.OnMouseUp(e);
+            State = MouseState.Over;
+            Invalidate();
+        }
 
-            //-- Maximize
-            _with4.DrawString( "i", Font, new SolidBrush( TextColor ), new Rectangle( 1, 1, Width, Height ),
-                Helpers.CenterSF );
-            //if ( FindForm().WindowState == FormWindowState.Maximized )
-            //{
-            //    _with4.DrawString( "i", Font, new SolidBrush( TextColor ), new Rectangle( 1, 1, Width, Height ), Helpers.CenterSF );
-            //}
-            //else if ( FindForm().WindowState == FormWindowState.Normal )
-            //{
-            //    _with4.DrawString( "i", Font, new SolidBrush( TextColor ), new Rectangle( 1, 1, Width, Height ), Helpers.CenterSF );
-            //}
+        /// <summary>
+        /// Handles the mouse move event.
+        /// </summary>
+        /// <param name="e">The mouse event arguments.</param>
+        protected override void OnMouseMove(MouseEventArgs e)
+        {
+            base.OnMouseMove(e);
+            x = e.X;
+            Invalidate();
+        }
 
-            //-- Hover/down
-            switch ( State )
+        /// <summary>
+        /// Handles the click event to toggle the window state between maximized and normal.
+        /// </summary>
+        /// <param name="e">The event arguments.</param>
+        protected override void OnClick(EventArgs e)
+        {
+            base.OnClick(e);
+            var form = FindForm();
+            if (form != null)
             {
-                case MouseState.Over:
-                    _with4.FillRectangle( new SolidBrush( Color.FromArgb( 30, Color.White ) ), Base );
-                    break;
-
-                case MouseState.Down:
-                    _with4.FillRectangle( new SolidBrush( Color.FromArgb( 30, Color.Black ) ), Base );
-                    break;
+                form.WindowState = form.WindowState == FormWindowState.Maximized ? FormWindowState.Normal : FormWindowState.Maximized;
             }
+        }
 
-            base.OnPaint( e );
-            G.Dispose();
-            e.Graphics.InterpolationMode = InterpolationMode.HighQualityBicubic;
-            e.Graphics.DrawImageUnscaled( B, 0, 0 );
-            B.Dispose();
+        /// <summary>
+        /// Handles the resize event to set the control size.
+        /// </summary>
+        /// <param name="e">The event arguments.</param>
+        protected override void OnResize(EventArgs e)
+        {
+            base.OnResize(e);
+            Size = new Size(10, 10);
+        }
+
+        /// <summary>
+        /// Paints the control.
+        /// </summary>
+        /// <param name="e">The paint event arguments.</param>
+        protected override void OnPaint(PaintEventArgs e)
+        {
+            using (var B = new Bitmap(Width, Height))
+            using (var G = Graphics.FromImage(B))
+            {
+                var Base = new Rectangle(0, 0, Width, Height);
+
+                G.SmoothingMode = SmoothingMode.HighQuality;
+                G.PixelOffsetMode = PixelOffsetMode.HighQuality;
+                G.TextRenderingHint = TextRenderingHint.ClearTypeGridFit;
+                G.Clear(BackColor);
+
+                // Draw base
+                G.FillRectangle(new SolidBrush(BaseColor), Base);
+
+                // Draw maximize icon (dot as big as the button and centered)
+                G.FillEllipse(new SolidBrush(TextColor), new Rectangle(0, 0, Width, Height));
+
+                // Draw hover/down effect
+                switch (State)
+                {
+                    case MouseState.Over:
+                        G.FillRectangle(new SolidBrush(Color.FromArgb(30, Color.White)), Base);
+                        break;
+                    case MouseState.Down:
+                        G.FillRectangle(new SolidBrush(Color.FromArgb(30, Color.Black)), Base);
+                        break;
+                }
+
+                base.OnPaint(e);
+                e.Graphics.InterpolationMode = InterpolationMode.HighQualityBicubic;
+                e.Graphics.DrawImageUnscaled(B, 0, 0);
+            }
         }
     }
 }

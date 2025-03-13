@@ -5,138 +5,156 @@ using System.Windows.Forms;
 
 namespace Anwesenheitsrechner.CustomUI
 {
+    /// <summary>
+    /// Custom progress bar control with advanced features such as custom colors, text, and border size.
+    /// </summary>
     public class CustomProgressBar : ProgressBar
     {
-        //Fields
-        private bool seeLabel = true;  
+        // Fields
+        private bool seeLabel = true;
         private string labelText = "%";
         private bool maximumValue = false;
         private int fontSize = 10;
         private Color textColor = Color.FromArgb(45, 51, 59);
         private Color barColor = Color.FromArgb(83, 155, 245);
         private FontFamily textFont = new FontFamily("Segoe UI Semibold");
-        //Fields
         private int borderSize = 0;
 
-        //Properties
-        [Category("1 CustomButton Advance")]
-    
+        // Properties
+        [Category("1 CustomProgressBar Advance")]
         public FontFamily TextFont
         {
-            get { return textFont; }    
-            set 
+            get => textFont;
+            set
             {
                 textFont = value;
-            }   
+                Invalidate();
+            }
         }
 
-        [Category("1 CustomButton Advance")]
+        [Category("1 CustomProgressBar Advance")]
         public string LabelText
         {
-            get { return labelText; }
+            get => labelText;
             set
             {
                 labelText = value;
-                this.Invalidate();
+                Invalidate();
             }
         }
-        [Category("1 CustomButton Advance")]
+
+        [Category("1 CustomProgressBar Advance")]
         public bool MaximumValue
         {
-            get { return maximumValue; }
+            get => maximumValue;
             set
             {
                 maximumValue = value;
-                this.Invalidate();
+                Invalidate();
             }
         }
-        [Category("1 CustomButton Advance")]
+
+        [Category("1 CustomProgressBar Advance")]
         public bool ShowStatus
         {
-            get { return seeLabel; }
+            get => seeLabel;
             set
             {
                 seeLabel = value;
-                this.Invalidate();
+                Invalidate();
             }
         }
-        [Category("1 CustomButton Advance")]
+
+        [Category("1 CustomProgressBar Advance")]
         public int FontSize
         {
-            get { return fontSize; }
+            get => fontSize;
             set
             {
                 fontSize = value;
-                this.Invalidate();
+                Invalidate();
             }
         }
-        [Category("1 CustomButton Advance")]
+
+        [Category("1 CustomProgressBar Advance")]
         public Color TextColor
         {
-            get { return textColor; }
-            set { textColor = value; }
+            get => textColor;
+            set
+            {
+                textColor = value;
+                Invalidate();
+            }
         }
-        [Category("1 CustomButton Advance")]
+
+        [Category("1 CustomProgressBar Advance")]
         public Color BarColor
         {
-            get { return barColor; }
-            set { barColor = value; }
+            get => barColor;
+            set
+            {
+                barColor = value;
+                Invalidate();
+            }
         }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="CustomProgressBar"/> class.
+        /// </summary>
         public CustomProgressBar()
-        { 
-            this.SetStyle(ControlStyles.UserPaint, true);
+        {
+            SetStyle(ControlStyles.UserPaint, true);
         }
-        //fix flikering
+
+        /// <summary>
+        /// Fixes flickering by enabling double buffering.
+        /// </summary>
         protected override CreateParams CreateParams
         {
             get
             {
-                CreateParams handleParam = base.CreateParams;
-                handleParam.ExStyle |= 0x02000000;   // WS_EX_COMPOSITED       
+                var handleParam = base.CreateParams;
+                handleParam.ExStyle |= 0x02000000; // WS_EX_COMPOSITED
                 return handleParam;
             }
         }
+
+        /// <summary>
+        /// Paints the progress bar control.
+        /// </summary>
+        /// <param name="e">The paint event arguments.</param>
         protected override void OnPaint(PaintEventArgs e)
         {
-            //color bar.
-            Brush barColor = new SolidBrush(BarColor);
-            //progress
-            Rectangle rec = e.ClipRectangle;
-            rec.Width = (int)(rec.Width * ((double)Value / Maximum));
-            //if (ProgressBarRenderer.IsSupported)
-            //    ProgressBarRenderer.DrawHorizontalBar(e.Graphics, e.ClipRectangle);
-            rec.Height = rec.Height;
-            e.Graphics.FillRectangle(barColor, 0,0, rec.Width, rec.Height);
-            Graphics g = e.Graphics;
-            //text
-            using (Font f = new Font(textFont, fontSize))
-            {
-                string textMinimum = $"{Value} {labelText}";
-                string textMaximum = $"{Value} {labelText} / {Maximum} {labelText} ";
-                string text = "";
-                if(seeLabel == true)
-                {
-                    if (maximumValue == false)
-                    {
-                        text = textMinimum;
-                    }
-                    else
-                    {
-                        text = textMaximum;
-                    }
-                }
-                using (Pen penBorder = new Pen(Color.Black, borderSize))
-                {
-                    penBorder.Alignment = PenAlignment.Inset;
-                    e.Graphics.DrawRectangle(penBorder, 0, 0, this.Width - 1, this.Height - 1);
-                }
+            base.OnPaint(e);
 
-                SizeF size = g.MeasureString(text, f);
-                int textlocationWidth = (int)((Width / 2) - (size.Width / 2));
-                int textlocationHeight = (int)((Height / 2) - (size.Height / 2));
-                Point location = new Point(textlocationWidth, textlocationHeight);
-                SolidBrush textolor = new SolidBrush(TextColor);
-                g.DrawString(text, f, textolor, location);
+            // Draw the progress bar
+            using (var barBrush = new SolidBrush(BarColor))
+            {
+                var rec = e.ClipRectangle;
+                rec.Width = (int)(rec.Width * ((double)Value / Maximum));
+                e.Graphics.FillRectangle(barBrush, 0, 0, rec.Width, rec.Height);
+            }
+
+            // Draw the text
+            if (seeLabel)
+            {
+                using (var font = new Font(textFont, fontSize))
+                {
+                    string text = maximumValue ? $"{Value} {labelText} / {Maximum} {labelText}" : $"{Value} {labelText}";
+                    var textSize = e.Graphics.MeasureString(text, font);
+                    var textLocation = new PointF((Width - textSize.Width) / 2, (Height - textSize.Height) / 2);
+                    using (var textBrush = new SolidBrush(TextColor))
+                    {
+                        e.Graphics.DrawString(text, font, textBrush, textLocation);
+                    }
+                }
+            }
+
+            // Draw the border
+            using (var penBorder = new Pen(Color.Black, borderSize))
+            {
+                penBorder.Alignment = PenAlignment.Inset;
+                e.Graphics.DrawRectangle(penBorder, 0, 0, Width - 1, Height - 1);
             }
         }
     }

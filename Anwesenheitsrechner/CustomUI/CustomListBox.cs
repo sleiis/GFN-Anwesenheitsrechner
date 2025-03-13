@@ -4,72 +4,123 @@ using System.ComponentModel;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Drawing.Text;
+using System.Linq;
 using System.Windows.Forms;
 
 namespace Anwesenheitsrechner.CustomUI
 {
+    /// <summary>
+    /// Custom list box control with advanced features such as custom colors and owner-drawn items.
+    /// </summary>
     public class CustomListBox : Control
     {
-        private ListBox withEventsField_ListBx = new ListBox();
+        private ListBox listBox;
 
-        private ListBox ListBx
+        /// <summary>
+        /// Gets or sets the items in the list box.
+        /// </summary>
+        [Category("Options")]
+        public string[] Items
         {
-            get => withEventsField_ListBx;
+            get => listBox.Items.Cast<string>().ToArray();
             set
             {
-                if ( withEventsField_ListBx != null ) withEventsField_ListBx.DrawItem -= Drawitem;
-                withEventsField_ListBx = value;
-                if ( withEventsField_ListBx != null ) withEventsField_ListBx.DrawItem += Drawitem;
-            }
-        }
-
-        private string[] _items = {""};
-
-        [Category( "Options" )]
-        public string[] items
-        {
-            get => _items;
-            set
-            {
-                _items = value;
-                ListBx.Items.Clear();
-                ListBx.Items.AddRange( value );
+                listBox.Items.Clear();
+                listBox.Items.AddRange(value);
                 Invalidate();
             }
         }
 
-        [Category( "Colors" )]
+        /// <summary>
+        /// Gets or sets the color of the selected item.
+        /// </summary>
+        [Category("Colors")]
         public Color SelectedColor { get; set; } = Helpers.FlatColor;
 
-        public string SelectedItem => ListBx.SelectedItem.ToString();
+        /// <summary>
+        /// Gets the selected item in the list box.
+        /// </summary>
+        public string SelectedItem => listBox.SelectedItem?.ToString();
 
-        public int SelectedIndex
+        /// <summary>
+        /// Gets the selected index in the list box.
+        /// </summary>
+        public int SelectedIndex => listBox.SelectedIndex;
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="CustomListBox"/> class.
+        /// </summary>
+        public CustomListBox()
         {
-            get
+            SetStyle(
+                ControlStyles.AllPaintingInWmPaint | ControlStyles.UserPaint | ControlStyles.ResizeRedraw |
+                ControlStyles.OptimizedDoubleBuffer, true);
+            DoubleBuffered = true;
+
+            listBox = new ListBox
             {
-                var functionReturnValue = 0;
-                return ListBx.SelectedIndex;
-                if ( ListBx.SelectedIndex < 0 )
-                    return functionReturnValue;
-                return functionReturnValue;
+                DrawMode = DrawMode.OwnerDrawFixed,
+                ScrollAlwaysVisible = false,
+                HorizontalScrollbar = false,
+                BorderStyle = BorderStyle.None,
+                BackColor = BaseColor,
+                ForeColor = Color.White,
+                Location = new Point(3, 3),
+                Font = new Font("Tahoma", 8),
+                ItemHeight = 20,
+                IntegralHeight = false
+            };
+            listBox.DrawItem += DrawItem;
+
+            Controls.Add(listBox);
+            Size = new Size(131, 101);
+            BackColor = BaseColor;
+        }
+
+        /// <summary>
+        /// Clears all items in the list box.
+        /// </summary>
+        public void Clear()
+        {
+            listBox.Items.Clear();
+        }
+
+        /// <summary>
+        /// Clears the selected items in the list box.
+        /// </summary>
+        public void ClearSelected()
+        {
+            for (int i = listBox.SelectedItems.Count - 1; i >= 0; i--)
+            {
+                listBox.Items.Remove(listBox.SelectedItems[i]);
             }
         }
 
-        public void Clear()
+        /// <summary>
+        /// Adds a range of items to the list box.
+        /// </summary>
+        /// <param name="items">The items to add.</param>
+        public void AddRange(object[] items)
         {
-            ListBx.Items.Clear();
+            listBox.Items.AddRange(items);
         }
 
-        public void ClearSelected()
+        /// <summary>
+        /// Adds a single item to the list box.
+        /// </summary>
+        /// <param name="item">The item to add.</param>
+        public void AddItem(object item)
         {
-            for ( var i = ListBx.SelectedItems.Count - 1; i >= 0; i += -1 )
-                ListBx.Items.Remove( ListBx.SelectedItems[i] );
+            listBox.Items.Add(item);
         }
 
-        public void Drawitem( object sender, DrawItemEventArgs e )
+        /// <summary>
+        /// Handles the draw item event to customize the appearance of the list box items.
+        /// </summary>
+        private void DrawItem(object sender, DrawItemEventArgs e)
         {
-            if ( e.Index < 0 )
-                return;
+            if (e.Index < 0) return;
+
             e.DrawBackground();
             e.DrawFocusRectangle();
 
@@ -78,107 +129,71 @@ namespace Anwesenheitsrechner.CustomUI
             e.Graphics.InterpolationMode = InterpolationMode.HighQualityBicubic;
             e.Graphics.TextRenderingHint = TextRenderingHint.ClearTypeGridFit;
 
-            //-- if selected
-            if ( e.State.ToString().IndexOf( "Selected," ) >= 0 )
-            {
-                //-- Base
-                e.Graphics.FillRectangle( new SolidBrush( SelectedColor ),
-                    new Rectangle( e.Bounds.X, e.Bounds.Y, e.Bounds.Width, e.Bounds.Height ) );
+            var itemText = " " + listBox.Items[e.Index].ToString();
+            var itemBounds = new Rectangle(e.Bounds.X, e.Bounds.Y, e.Bounds.Width, e.Bounds.Height);
 
-                //-- Text
-                e.Graphics.DrawString( " " + ListBx.Items[e.Index].ToString(), new Font( "Tahoma", 8 ), Brushes.White,
-                    e.Bounds.X, e.Bounds.Y + 2 );
+            if ((e.State & DrawItemState.Selected) == DrawItemState.Selected)
+            {
+                e.Graphics.FillRectangle(new SolidBrush(SelectedColor), itemBounds);
+                e.Graphics.DrawString(itemText, new Font("Tahoma", 8), Brushes.White, itemBounds.X, itemBounds.Y + 2);
             }
             else
             {
-                //-- Base
-                e.Graphics.FillRectangle( new SolidBrush( Color.FromArgb( 51, 53, 55 ) ),
-                    new Rectangle( e.Bounds.X, e.Bounds.Y, e.Bounds.Width, e.Bounds.Height ) );
-
-                //-- Text 
-                e.Graphics.DrawString( " " + ListBx.Items[e.Index].ToString(), new Font( "Tahoma", 8 ), Brushes.White,
-                    e.Bounds.X, e.Bounds.Y + 2 );
+                e.Graphics.FillRectangle(new SolidBrush(Color.FromArgb(51, 53, 55)), itemBounds);
+                e.Graphics.DrawString(itemText, new Font("Tahoma", 8), Brushes.White, itemBounds.X, itemBounds.Y + 2);
             }
-
-            e.Graphics.Dispose();
         }
 
+        /// <summary>
+        /// Handles the creation of the control.
+        /// </summary>
         protected override void OnCreateControl()
         {
             base.OnCreateControl();
-            if ( !Controls.Contains( ListBx ) ) Controls.Add( ListBx );
+            if (!Controls.Contains(listBox))
+            {
+                Controls.Add(listBox);
+            }
         }
 
-        public void AddRange( object[] items )
-        {
-            ListBx.Items.Remove( "" );
-            ListBx.Items.AddRange( items );
-        }
-
-        public void AddItem( object item )
-        {
-            ListBx.Items.Remove( "" );
-            ListBx.Items.Add( item );
-        }
-
-        private readonly Color BaseColor = Color.FromArgb( 24, 22, 43 );
-
-        public CustomListBox()
-        {
-            SetStyle(
-                ControlStyles.AllPaintingInWmPaint | ControlStyles.UserPaint | ControlStyles.ResizeRedraw |
-                ControlStyles.OptimizedDoubleBuffer, true );
-            DoubleBuffered = true;
-
-            ListBx.DrawMode = DrawMode.OwnerDrawFixed;
-            ListBx.ScrollAlwaysVisible = false;
-            ListBx.HorizontalScrollbar = false;
-            ListBx.BorderStyle = BorderStyle.None;
-            ListBx.BackColor = BaseColor;
-            ListBx.ForeColor = Color.White;
-            ListBx.Location = new Point( 3, 3 );
-            ListBx.Font = new Font( "Tahoma", 8 );
-            ListBx.ItemHeight = 20;
-            ListBx.Items.Clear();
-            ListBx.IntegralHeight = false;
-
-            Size = new Size( 131, 101 );
-            BackColor = BaseColor;
-        }
-
-        protected override void OnPaint( PaintEventArgs e )
+        /// <summary>
+        /// Paints the list box control.
+        /// </summary>
+        protected override void OnPaint(PaintEventArgs e)
         {
             UpdateColors();
 
-            var B = new Bitmap( Width, Height );
-            var G = Graphics.FromImage( B );
+            using (var B = new Bitmap(Width, Height))
+            using (var G = Graphics.FromImage(B))
+            {
+                var Base = new Rectangle(0, 0, Width, Height);
 
-            var Base = new Rectangle( 0, 0, Width, Height );
+                G.SmoothingMode = SmoothingMode.HighQuality;
+                G.PixelOffsetMode = PixelOffsetMode.HighQuality;
+                G.TextRenderingHint = TextRenderingHint.ClearTypeGridFit;
+                G.Clear(BackColor);
 
-            var _with19 = G;
-            _with19.SmoothingMode = SmoothingMode.HighQuality;
-            _with19.PixelOffsetMode = PixelOffsetMode.HighQuality;
-            _with19.TextRenderingHint = TextRenderingHint.ClearTypeGridFit;
-            _with19.Clear( BackColor );
+                // Set list box size
+                listBox.Size = new Size(Width - 6, Height - 2);
 
-            //-- Size
-            ListBx.Size = new Size( Width - 6, Height - 2 );
+                // Draw base
+                G.FillRectangle(new SolidBrush(BaseColor), Base);
 
-            //-- Base
-            _with19.FillRectangle( new SolidBrush( BaseColor ), Base );
-
-            base.OnPaint( e );
-            G.Dispose();
-            e.Graphics.InterpolationMode = InterpolationMode.HighQualityBicubic;
-            e.Graphics.DrawImageUnscaled( B, 0, 0 );
-            B.Dispose();
+                base.OnPaint(e);
+                e.Graphics.InterpolationMode = InterpolationMode.HighQualityBicubic;
+                e.Graphics.DrawImageUnscaled(B, 0, 0);
+            }
         }
 
+        /// <summary>
+        /// Updates the colors of the list box based on the parent control.
+        /// </summary>
         private void UpdateColors()
         {
-            var colors = Helpers.GetColors( this );
-
+            var colors = Helpers.GetColors(this);
             SelectedColor = colors.Flat;
         }
+
+        private readonly Color BaseColor = Color.FromArgb(24, 22, 43);
     }
 }

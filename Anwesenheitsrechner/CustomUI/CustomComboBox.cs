@@ -7,10 +7,13 @@ using System;
 
 namespace Anwesenheitsrechner.CustomUI
 {
+    /// <summary>
+    /// Custom combo box control with advanced features such as custom colors, border size, and icon.
+    /// </summary>
     [DefaultEvent("OnSelectedIndexChanged")]
     public class CustomComboBox : UserControl
     {
-        //Fields
+        // Fields
         private Color backColor = Color.WhiteSmoke;
         private Color iconColor = Color.MediumSlateBlue;
         private Color listBackColor = Color.FromArgb(230, 228, 245);
@@ -18,15 +21,15 @@ namespace Anwesenheitsrechner.CustomUI
         private Color borderColor = Color.MediumSlateBlue;
         private int borderSize = 1;
 
-        //Items
+        // Items
         private readonly ComboBox cmbList;
         private readonly Label lblText;
         private readonly Button btnIcon;
 
-        //Events
-        public event EventHandler OnSelectedIndexChanged; //Default event
+        // Events
+        public event EventHandler OnSelectedIndexChanged; // Default event
 
-        //Constructor
+        // Constructor
         public CustomComboBox()
         {
             cmbList = new ComboBox();
@@ -34,51 +37,51 @@ namespace Anwesenheitsrechner.CustomUI
             btnIcon = new Button();
             SuspendLayout();
 
-            //ComboBox: Dropdown list
+            // ComboBox: Dropdown list
             cmbList.BackColor = listBackColor;
             cmbList.Font = new Font(Font.Name, 10F);
             cmbList.ForeColor = listTextColor;
-            cmbList.SelectedIndexChanged += new EventHandler(ComboBox_SelectedIndexChanged); //Default event
-            cmbList.TextChanged +=  new EventHandler(ComboBox_TextChanged); //Refresh text
+            cmbList.SelectedIndexChanged += ComboBox_SelectedIndexChanged; // Default event
+            cmbList.TextChanged += ComboBox_TextChanged; // Refresh text
 
-            //Button: Icon
+            // Button: Icon
             btnIcon.Dock = DockStyle.Right;
             btnIcon.FlatStyle = FlatStyle.Flat;
             btnIcon.FlatAppearance.BorderSize = 0;
             btnIcon.BackColor = backColor;
             btnIcon.Size = new Size(30, 30);
             btnIcon.Cursor = Cursors.Hand;
-            btnIcon.Click += new EventHandler(Icon_Click); //Open dropdown list
-            btnIcon.Paint += new PaintEventHandler(Icon_Paint); //Draw icon
+            btnIcon.Click += Icon_Click; // Open dropdown list
+            btnIcon.Paint += Icon_Paint; // Draw icon
 
-            //Label: Text
+            // Label: Text
             lblText.Dock = DockStyle.Fill;
             lblText.AutoSize = false;
             lblText.BackColor = backColor;
             lblText.TextAlign = ContentAlignment.MiddleLeft;
             lblText.Padding = new Padding(8, 0, 0, 0);
-            lblText.Font = new Font(this.Font.Name, 10F);
-            //->Attach label events to user control event
-            lblText.Click += new EventHandler(Surface_Click); //Select combo box
-            lblText.MouseEnter += new EventHandler(Surface_MouseEnter);
-            lblText.MouseLeave += new EventHandler(Surface_MouseLeave);
+            lblText.Font = new Font(Font.Name, 10F);
+            // Attach label events to user control event
+            lblText.Click += Surface_Click; // Select combo box
+            lblText.MouseEnter += Surface_MouseEnter;
+            lblText.MouseLeave += Surface_MouseLeave;
 
-            //User Control
-            Controls.Add(lblText); //2
-            Controls.Add(btnIcon); //1
-            Controls.Add(cmbList); //0
+            // User Control
+            Controls.Add(lblText); // 2
+            Controls.Add(btnIcon); // 1
+            Controls.Add(cmbList); // 0
             MinimumSize = new Size(200, 27); // Less than 27 have a glitch
             Size = new Size(200, 27);
             ForeColor = Color.DimGray;
-            Padding = new Padding(borderSize); //Border Size
-            Font = new Font(this.Font.Name, 10F);
-            base.BackColor = borderColor; //Border Color
+            Padding = new Padding(borderSize); // Border Size
+            Font = new Font(Font.Name, 10F);
+            base.BackColor = borderColor; // Border Color
             ResumeLayout();
             AdjustComboBoxDimensions();
         }
 
-        //Properties
-        //-> Appearance
+        // Properties
+        // Appearance
         [Category("1 CustomComboBox - Properties")]
         public new Color BackColor
         {
@@ -94,18 +97,18 @@ namespace Anwesenheitsrechner.CustomUI
         [Category("1 CustomComboBox - Properties")]
         public Color IconColor
         {
-            get => iconColor; 
+            get => iconColor;
             set
             {
                 iconColor = value;
-                btnIcon.Invalidate(); //Redraw icon
+                btnIcon.Invalidate(); // Redraw icon
             }
         }
 
         [Category("1 CustomComboBox - Properties")]
         public Color ListBackColor
         {
-            get => listBackColor; 
+            get => listBackColor;
             set
             {
                 listBackColor = value;
@@ -116,7 +119,7 @@ namespace Anwesenheitsrechner.CustomUI
         [Category("1 CustomComboBox - Properties")]
         public Color ListTextColor
         {
-            get => listTextColor; 
+            get => listTextColor;
             set
             {
                 listTextColor = value;
@@ -127,22 +130,22 @@ namespace Anwesenheitsrechner.CustomUI
         [Category("1 CustomComboBox - Properties")]
         public Color BorderColor
         {
-            get => borderColor; 
+            get => borderColor;
             set
             {
                 borderColor = value;
-                base.BackColor = borderColor; //Border Color
+                base.BackColor = borderColor; // Border Color
             }
         }
 
         [Category("1 CustomComboBox - Properties")]
         public int BorderSize
         {
-            get => borderSize; 
+            get => borderSize;
             set
             {
                 borderSize = value;
-                this.Padding = new Padding(borderSize); //Border Size
+                Padding = new Padding(borderSize); // Border Size
                 AdjustComboBoxDimensions();
             }
         }
@@ -150,7 +153,7 @@ namespace Anwesenheitsrechner.CustomUI
         [Category("1 CustomComboBox - Properties")]
         public override Color ForeColor
         {
-            get => base.ForeColor; 
+            get => base.ForeColor;
             set
             {
                 base.ForeColor = value;
@@ -161,43 +164,40 @@ namespace Anwesenheitsrechner.CustomUI
         [Category("1 CustomComboBox - Properties")]
         public override Font Font
         {
-            get => base.Font; 
+            get => base.Font;
             set
             {
                 base.Font = value;
                 lblText.Font = value;
-                cmbList.Font = value; //Optional
+                cmbList.Font = value; // Optional
             }
         }
 
         [Category("1 CustomComboBox - Properties")]
         public string Texts
         {
-            get => lblText.Text; 
-            set => lblText.Text = value; 
+            get => lblText.Text;
+            set => lblText.Text = value;
         }
 
-        [Category("1 CustomComboBox - Properties- Properties")]
+        [Category("1 CustomComboBox - Properties")]
         public ComboBoxStyle DropDownStyle
         {
-            get => cmbList.DropDownStyle; 
+            get => cmbList.DropDownStyle;
             set
             {
                 if (cmbList.DropDownStyle != ComboBoxStyle.Simple)
                     cmbList.DropDownStyle = value;
             }
         }
-        //Properties
-        //-> Data
+
+        // Data
         [Category("1 CustomComboBox - Data")]
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Content)]
         [Editor("System.Windows.Forms.Design.ListControlStringCollectionEditor, System.Design, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a", typeof(UITypeEditor))]
         [Localizable(true)]
         [MergableProperty(false)]
-        public ComboBox.ObjectCollection Items
-        {
-            get => cmbList.Items; 
-        }
+        public ComboBox.ObjectCollection Items => cmbList.Items;
 
         [Category("1 CustomComboBox - Data")]
         [AttributeProvider(typeof(IListSource))]
@@ -205,10 +205,10 @@ namespace Anwesenheitsrechner.CustomUI
         public object DataSource
         {
             get => cmbList.DataSource;
-            set => cmbList.DataSource = value; 
+            set => cmbList.DataSource = value;
         }
 
-        [Category("1 CustomComboBox  - Data")]
+        [Category("1 CustomComboBox - Data")]
         [Browsable(true)]
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Content)]
         [Editor("System.Windows.Forms.Design.ListControlStringCollectionEditor, System.Design, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a", typeof(UITypeEditor))]
@@ -217,20 +217,20 @@ namespace Anwesenheitsrechner.CustomUI
         public AutoCompleteStringCollection AutoCompleteCustomSource
         {
             get => cmbList.AutoCompleteCustomSource;
-            set => cmbList.AutoCompleteCustomSource = value; 
+            set => cmbList.AutoCompleteCustomSource = value;
         }
 
-        [Category("1 CustomComboBox  - Data")]
+        [Category("1 CustomComboBox - Data")]
         [Browsable(true)]
         [DefaultValue(AutoCompleteSource.None)]
         [EditorBrowsable(EditorBrowsableState.Always)]
         public AutoCompleteSource AutoCompleteSource
         {
             get => cmbList.AutoCompleteSource;
-            set => cmbList.AutoCompleteSource = value; 
+            set => cmbList.AutoCompleteSource = value;
         }
 
-        [Category("1 CustomComboBox  - Data")]
+        [Category("1 CustomComboBox - Data")]
         [Browsable(true)]
         [DefaultValue(AutoCompleteMode.None)]
         [EditorBrowsable(EditorBrowsableState.Always)]
@@ -250,7 +250,7 @@ namespace Anwesenheitsrechner.CustomUI
             set => cmbList.SelectedItem = value;
         }
 
-        [Category("1 CustomComboBox  - Data")]
+        [Category("1 CustomComboBox - Data")]
         [Browsable(false)]
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public int SelectedIndex
@@ -259,14 +259,14 @@ namespace Anwesenheitsrechner.CustomUI
             set => cmbList.SelectedIndex = value;
         }
 
-        [Category("1 CustomComboBox  - Data")]
+        [Category("1 CustomComboBox - Data")]
         [DefaultValue("")]
         [Editor("System.Windows.Forms.Design.DataMemberFieldEditor, System.Design, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a", typeof(UITypeEditor))]
         [TypeConverter("System.Windows.Forms.Design.DataMemberFieldConverter, System.Design, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a")]
         public string DisplayMember
         {
             get => cmbList.DisplayMember;
-            set => cmbList.DisplayMember = value; 
+            set => cmbList.DisplayMember = value;
         }
 
         [Category("1 CustomComboBox - Data")]
@@ -275,87 +275,102 @@ namespace Anwesenheitsrechner.CustomUI
         public string ValueMember
         {
             get => cmbList.ValueMember;
-            set => cmbList.ValueMember = value; 
+            set => cmbList.ValueMember = value;
         }
-        //Private methods
+
+        // Private methods
+        /// <summary>
+        /// Adjusts the dimensions of the combo box.
+        /// </summary>
         private void AdjustComboBoxDimensions()
         {
             cmbList.Width = lblText.Width;
-            cmbList.Location = new Point()
-            {
-                X = Width - Padding.Right - cmbList.Width,
-                Y = lblText.Bottom - cmbList.Height
-            };
+            cmbList.Location = new Point(Width - Padding.Right - cmbList.Width, lblText.Bottom - cmbList.Height);
         }
-        //Event methods
-        //-> Default event
+
+        // Event methods
+        /// <summary>
+        /// Handles the selected index changed event of the combo box.
+        /// </summary>
         private void ComboBox_SelectedIndexChanged(object sender, EventArgs e)
         {
             OnSelectedIndexChanged?.Invoke(sender, e);
-            //Refresh text
-            lblText.Text = cmbList.Text;
+            lblText.Text = cmbList.Text; // Refresh text
         }
-        //-> Draw icon
+
+        /// <summary>
+        /// Draws the icon on the button.
+        /// </summary>
         private void Icon_Paint(object sender, PaintEventArgs e)
         {
-            //Fields
-            int iconWidht = 14;
+            int iconWidth = 14;
             int iconHeight = 6;
-            var rectIcon = new Rectangle((btnIcon.Width - iconWidht) / 2, (btnIcon.Height - iconHeight) / 2, iconWidht, iconHeight);
+            var rectIcon = new Rectangle((btnIcon.Width - iconWidth) / 2, (btnIcon.Height - iconHeight) / 2, iconWidth, iconHeight);
             Graphics graph = e.Graphics;
 
-            //Draw arrow down icon
-            using (GraphicsPath path = new GraphicsPath())
-            using (Pen pen = new Pen(iconColor, 2))
+            // Draw arrow down icon
+            using (var path = new GraphicsPath())
+            using (var pen = new Pen(iconColor, 2))
             {
                 graph.SmoothingMode = SmoothingMode.AntiAlias;
-                path.AddLine(rectIcon.X, rectIcon.Y, rectIcon.X + (iconWidht / 2), rectIcon.Bottom);
-                path.AddLine(rectIcon.X + (iconWidht / 2), rectIcon.Bottom, rectIcon.Right, rectIcon.Y);
+                path.AddLine(rectIcon.X, rectIcon.Y, rectIcon.X + (iconWidth / 2), rectIcon.Bottom);
+                path.AddLine(rectIcon.X + (iconWidth / 2), rectIcon.Bottom, rectIcon.Right, rectIcon.Y);
                 graph.DrawPath(pen, path);
             }
         }
-        //-> Items actions
+
+        /// <summary>
+        /// Handles the click event of the icon button.
+        /// </summary>
         private void Icon_Click(object sender, EventArgs e)
         {
-            //Open dropdown list
             cmbList.Select();
-            cmbList.DroppedDown = true;
+            cmbList.DroppedDown = true; // Open dropdown list
         }
+
+        /// <summary>
+        /// Handles the click event of the surface (label).
+        /// </summary>
         private void Surface_Click(object sender, EventArgs e)
         {
-            //Attach label click to user control click
             OnClick(e);
-            //Select combo box
             cmbList.Select();
             if (cmbList.DropDownStyle == ComboBoxStyle.DropDownList)
             {
-                cmbList.DroppedDown = true; //Open dropdown list
+                cmbList.DroppedDown = true; // Open dropdown list
             }
         }
+
+        /// <summary>
+        /// Handles the text changed event of the combo box.
+        /// </summary>
         private void ComboBox_TextChanged(object sender, EventArgs e)
         {
-            //Refresh text
-            lblText.Text = cmbList.Text;
+            lblText.Text = cmbList.Text; // Refresh text
         }
 
-        //->Attach label events to user control event
+        /// <summary>
+        /// Handles the mouse leave event of the surface (label).
+        /// </summary>
         private void Surface_MouseLeave(object sender, EventArgs e)
         {
             OnMouseLeave(e);
         }
+
+        /// <summary>
+        /// Handles the mouse enter event of the surface (label).
+        /// </summary>
         private void Surface_MouseEnter(object sender, EventArgs e)
         {
-            this.OnMouseEnter(e);
+            OnMouseEnter(e);
         }
-        //::::+
-        //Overridden methods
+
+        /// <summary>
+        /// Handles the resize event of the control.
+        /// </summary>
         protected override void OnResize(EventArgs e)
         {
             base.OnResize(e);
-            AdjustComboBoxDimensions();
-        }
-        private void TrionComboBox_Load(object sender, EventArgs e)
-        {
             AdjustComboBoxDimensions();
         }
     }

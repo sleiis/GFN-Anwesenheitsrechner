@@ -8,7 +8,10 @@ using System.Windows.Forms;
 
 namespace Anwesenheitsrechner.CustomUI
 {
-    [DefaultEvent( "CheckedChanged" )]
+    /// <summary>
+    /// Custom checkbox control with advanced features such as custom styles and state-based color changes.
+    /// </summary>
+    [DefaultEvent("CheckedChanged")]
     public class CustomCheckBox : Control
     {
         private int W;
@@ -16,12 +19,9 @@ namespace Anwesenheitsrechner.CustomUI
         private MouseState State = MouseState.None;
         private bool _Checked;
 
-        protected override void OnTextChanged( EventArgs e )
-        {
-            base.OnTextChanged( e );
-            Invalidate();
-        }
-
+        /// <summary>
+        /// Gets or sets a value indicating whether the checkbox is checked.
+        /// </summary>
         public bool Checked
         {
             get => _Checked;
@@ -32,189 +32,240 @@ namespace Anwesenheitsrechner.CustomUI
             }
         }
 
+        /// <summary>
+        /// Occurs when the checked state changes.
+        /// </summary>
         public event CheckedChangedEventHandler CheckedChanged;
 
-        public delegate void CheckedChangedEventHandler( object sender );
+        /// <summary>
+        /// Represents the method that will handle the <see cref="CheckedChanged"/> event.
+        /// </summary>
+        /// <param name="sender">The source of the event.</param>
+        public delegate void CheckedChangedEventHandler(object sender);
 
-        protected override void OnClick( EventArgs e )
-        {
-            _Checked = !_Checked;
-            CheckedChanged?.Invoke( this );
-
-            base.OnClick( e );
-        }
-
-        [Flags()]
+        /// <summary>
+        /// Enum representing the style options for the checkbox.
+        /// </summary>
+        [Flags]
         public enum _Options
         {
             Style1,
             Style2
         }
 
-        [Category( "Options" )]
+        /// <summary>
+        /// Gets or sets the style options for the checkbox.
+        /// </summary>
+        [Category("Options")]
         public _Options Options { get; set; }
 
-        protected override void OnResize( EventArgs e )
-        {
-            base.OnResize( e );
-            Height = 22;
-        }
+        /// <summary>
+        /// Gets or sets the base color of the checkbox.
+        /// </summary>
+        [Category("Colors")]
+        public Color BaseColor { get; set; } = Color.FromArgb(24, 22, 43);
 
-        [Category( "Colors" )]
-        public Color BaseColor { get; set; } = Color.FromArgb( 24, 22, 43 );
-
-        [Category( "Colors" )]
+        /// <summary>
+        /// Gets or sets the border color of the checkbox.
+        /// </summary>
+        [Category("Colors")]
         public Color BorderColor { get; set; } = Helpers.FlatColor;
-
-        protected override void OnMouseDown( MouseEventArgs e )
-        {
-            base.OnMouseDown( e );
-            State = MouseState.Down;
-            Invalidate();
-        }
-
-        protected override void OnMouseUp( MouseEventArgs e )
-        {
-            base.OnMouseUp( e );
-            State = MouseState.Over;
-            Invalidate();
-        }
-
-        protected override void OnMouseEnter( EventArgs e )
-        {
-            base.OnMouseEnter( e );
-            State = MouseState.Over;
-            Invalidate();
-        }
-
-        protected override void OnMouseLeave( EventArgs e )
-        {
-            base.OnMouseLeave( e );
-            State = MouseState.None;
-            Invalidate();
-        }
 
         private readonly Color _TextColor = Helpers.FlatWhite;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="CustomCheckBox"/> class.
+        /// </summary>
         public CustomCheckBox()
         {
             SetStyle(
                 ControlStyles.AllPaintingInWmPaint | ControlStyles.UserPaint | ControlStyles.ResizeRedraw |
-                ControlStyles.OptimizedDoubleBuffer, true );
+                ControlStyles.OptimizedDoubleBuffer, true);
             DoubleBuffered = true;
-            BackColor = Color.FromArgb( 35, 30, 59 );
+            BackColor = Color.FromArgb(35, 30, 59);
             Cursor = Cursors.Hand;
-            Font = new Font( "Tahoma", 10 );
-            Size = new Size( 112, 22 );
+            Font = new Font("Tahoma", 10);
+            Size = new Size(112, 22);
         }
 
-        protected override void OnPaint( PaintEventArgs e )
+        /// <summary>
+        /// Handles the text changed event.
+        /// </summary>
+        /// <param name="e">The event arguments.</param>
+        protected override void OnTextChanged(EventArgs e)
+        {
+            base.OnTextChanged(e);
+            Invalidate();
+        }
+
+        /// <summary>
+        /// Handles the click event.
+        /// </summary>
+        /// <param name="e">The event arguments.</param>
+        protected override void OnClick(EventArgs e)
+        {
+            _Checked = !_Checked;
+            CheckedChanged?.Invoke(this);
+            base.OnClick(e);
+        }
+
+        /// <summary>
+        /// Handles the resize event.
+        /// </summary>
+        /// <param name="e">The event arguments.</param>
+        protected override void OnResize(EventArgs e)
+        {
+            base.OnResize(e);
+            Height = 22;
+        }
+
+        /// <summary>
+        /// Handles the mouse down event.
+        /// </summary>
+        /// <param name="e">The mouse event arguments.</param>
+        protected override void OnMouseDown(MouseEventArgs e)
+        {
+            base.OnMouseDown(e);
+            State = MouseState.Down;
+            Invalidate();
+        }
+
+        /// <summary>
+        /// Handles the mouse up event.
+        /// </summary>
+        /// <param name="e">The mouse event arguments.</param>
+        protected override void OnMouseUp(MouseEventArgs e)
+        {
+            base.OnMouseUp(e);
+            State = MouseState.Over;
+            Invalidate();
+        }
+
+        /// <summary>
+        /// Handles the mouse enter event.
+        /// </summary>
+        /// <param name="e">The event arguments.</param>
+        protected override void OnMouseEnter(EventArgs e)
+        {
+            base.OnMouseEnter(e);
+            State = MouseState.Over;
+            Invalidate();
+        }
+
+        /// <summary>
+        /// Handles the mouse leave event.
+        /// </summary>
+        /// <param name="e">The event arguments.</param>
+        protected override void OnMouseLeave(EventArgs e)
+        {
+            base.OnMouseLeave(e);
+            State = MouseState.None;
+            Invalidate();
+        }
+
+        /// <summary>
+        /// Paints the checkbox control.
+        /// </summary>
+        /// <param name="e">The paint event arguments.</param>
+        protected override void OnPaint(PaintEventArgs e)
         {
             UpdateColors();
 
-            var B = new Bitmap( Width, Height );
-            var G = Graphics.FromImage( B );
-            W = Width - 1;
-            H = Height - 1;
-
-            var Base = new Rectangle( 0, 2, Height - 5, Height - 5 );
-
-            var _with11 = G;
-            _with11.SmoothingMode = SmoothingMode.HighQuality;
-            _with11.TextRenderingHint = TextRenderingHint.ClearTypeGridFit;
-            _with11.Clear( BackColor );
-            switch ( Options )
+            using (var B = new Bitmap(Width, Height))
+            using (var G = Graphics.FromImage(B))
             {
-                case _Options.Style1:
-                    //-- Style 1
-                    //-- Base
-                    _with11.FillRectangle( new SolidBrush( BaseColor ), Base );
+                W = Width - 1;
+                H = Height - 1;
 
-                    switch ( State )
-                    {
-                        case MouseState.Over:
-                            //-- Base
-                            _with11.DrawRectangle( new Pen( BorderColor ), Base );
-                            break;
+                var Base = new Rectangle(0, 2, Height - 5, Height - 5);
 
-                        case MouseState.Down:
-                            //-- Base
-                            _with11.DrawRectangle( new Pen( BorderColor ), Base );
-                            break;
-                    }
+                G.SmoothingMode = SmoothingMode.HighQuality;
+                G.TextRenderingHint = TextRenderingHint.ClearTypeGridFit;
+                G.Clear(BackColor);
 
-                    //-- If Checked
-                    if ( Checked )
-                    {
-                        _with11.DrawString( "ü", new Font( "Wingdings", 18 ), new SolidBrush( BorderColor ),
-                            new Rectangle( 5, 7, H - 9, H - 9 ), Helpers.CenterSF );
-                    }
+                switch (Options)
+                {
+                    case _Options.Style1:
+                        DrawStyle1(G, Base);
+                        break;
+                    case _Options.Style2:
+                        DrawStyle2(G, Base);
+                        break;
+                }
 
-                    //-- If Enabled
-                    if ( Enabled == false )
-                    {
-                        _with11.FillRectangle( new SolidBrush( Color.FromArgb( 54, 58, 61 ) ), Base );
-                        _with11.DrawString( Text, Font, new SolidBrush( Color.FromArgb( 140, 142, 143 ) ),
-                            new Rectangle( 20, 2, W, H ), Helpers.NearSF );
-                    }
-
-                    //-- Text
-                    _with11.DrawString( Text, Font, new SolidBrush( _TextColor ), new Rectangle( 20, 2, W, H ),
-                        Helpers.NearSF );
-                    break;
-
-                case _Options.Style2:
-                    //-- Style 2
-                    //-- Base
-                    _with11.FillRectangle( new SolidBrush( BaseColor ), Base );
-
-                    switch ( State )
-                    {
-                        case MouseState.Over:
-                            //-- Base
-                            _with11.DrawRectangle( new Pen( BorderColor ), Base );
-                            _with11.FillRectangle( new SolidBrush( Color.FromArgb( 118, 213, 170 ) ), Base );
-                            break;
-
-                        case MouseState.Down:
-                            //-- Base
-                            _with11.DrawRectangle( new Pen( BorderColor ), Base );
-                            _with11.FillRectangle( new SolidBrush( Color.FromArgb( 118, 213, 170 ) ), Base );
-                            break;
-                    }
-
-                    //-- If Checked
-                    if ( Checked )
-                    {
-                        _with11.DrawString( "ü", new Font( "Wingdings", 18 ), new SolidBrush( BorderColor ),
-                            new Rectangle( 5, 7, H - 9, H - 9 ), Helpers.CenterSF );
-                    }
-
-                    //-- If Enabled
-                    if ( Enabled == false )
-                    {
-                        _with11.FillRectangle( new SolidBrush( Color.FromArgb( 54, 58, 61 ) ), Base );
-                        _with11.DrawString( Text, Font, new SolidBrush( Color.FromArgb( 48, 119, 91 ) ),
-                            new Rectangle( 20, 2, W, H ), Helpers.NearSF );
-                    }
-
-                    //-- Text
-                    _with11.DrawString( Text, Font, new SolidBrush( _TextColor ), new Rectangle( 20, 2, W, H ),
-                        Helpers.NearSF );
-                    break;
+                base.OnPaint(e);
+                e.Graphics.InterpolationMode = InterpolationMode.HighQualityBicubic;
+                e.Graphics.DrawImageUnscaled(B, 0, 0);
             }
-
-            base.OnPaint( e );
-            G.Dispose();
-            e.Graphics.InterpolationMode = InterpolationMode.HighQualityBicubic;
-            e.Graphics.DrawImageUnscaled( B, 0, 0 );
-            B.Dispose();
         }
 
+        /// <summary>
+        /// Draws the checkbox in Style1.
+        /// </summary>
+        /// <param name="G">The graphics object.</param>
+        /// <param name="Base">The base rectangle.</param>
+        private void DrawStyle1(Graphics G, Rectangle Base)
+        {
+            G.FillRectangle(new SolidBrush(BaseColor), Base);
+
+            if (State == MouseState.Over || State == MouseState.Down)
+            {
+                G.DrawRectangle(new Pen(BorderColor), Base);
+            }
+
+            if (Checked)
+            {
+                G.DrawString("ü", new Font("Wingdings", 18), new SolidBrush(BorderColor), new Rectangle(5, 7, H - 9, H - 9), Helpers.CenterSF);
+            }
+
+            if (!Enabled)
+            {
+                G.FillRectangle(new SolidBrush(Color.FromArgb(54, 58, 61)), Base);
+                G.DrawString(Text, Font, new SolidBrush(Color.FromArgb(140, 142, 143)), new Rectangle(20, 2, W, H), Helpers.NearSF);
+            }
+            else
+            {
+                G.DrawString(Text, Font, new SolidBrush(_TextColor), new Rectangle(20, 2, W, H), Helpers.NearSF);
+            }
+        }
+
+        /// <summary>
+        /// Draws the checkbox in Style2.
+        /// </summary>
+        /// <param name="G">The graphics object.</param>
+        /// <param name="Base">The base rectangle.</param>
+        private void DrawStyle2(Graphics G, Rectangle Base)
+        {
+            G.FillRectangle(new SolidBrush(BaseColor), Base);
+
+            if (State == MouseState.Over || State == MouseState.Down)
+            {
+                G.DrawRectangle(new Pen(BorderColor), Base);
+                G.FillRectangle(new SolidBrush(Color.FromArgb(118, 213, 170)), Base);
+            }
+
+            if (Checked)
+            {
+                G.DrawString("ü", new Font("Wingdings", 18), new SolidBrush(BorderColor), new Rectangle(5, 7, H - 9, H - 9), Helpers.CenterSF);
+            }
+
+            if (!Enabled)
+            {
+                G.FillRectangle(new SolidBrush(Color.FromArgb(54, 58, 61)), Base);
+                G.DrawString(Text, Font, new SolidBrush(Color.FromArgb(48, 119, 91)), new Rectangle(20, 2, W, H), Helpers.NearSF);
+            }
+            else
+            {
+                G.DrawString(Text, Font, new SolidBrush(_TextColor), new Rectangle(20, 2, W, H), Helpers.NearSF);
+            }
+        }
+
+        /// <summary>
+        /// Updates the colors of the checkbox based on the parent control.
+        /// </summary>
         private void UpdateColors()
         {
-            var colors = Helpers.GetColors( this );
-
+            var colors = Helpers.GetColors(this);
             BorderColor = colors.Flat;
         }
     }
