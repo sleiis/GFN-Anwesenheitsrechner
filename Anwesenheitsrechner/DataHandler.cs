@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Specialized;
 using System.Data.SQLite;
+using System.IO;
 using System.Windows.Forms;
 using definitions;
 
@@ -8,7 +9,7 @@ namespace Anwesenheitsrechner
 {
     internal class DataHandler
     {
-
+        readonly string appDataPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "GFN_Anwesenheitsrechner");
         private SQLiteConnection sqlite_conn;
 
 
@@ -73,7 +74,7 @@ namespace Anwesenheitsrechner
                 // Set default language to German   
                 if (int.Parse(readSQL("Select count(*) From Settings where name='language';").GetValues(0)[0]) == 0)
                 {
-                    writeSQL("Insert into Settings Values ('language', 'Deutsch');");
+                    writeSQL("Insert into Settings Values ('language', 'Deutsch'), ('total_days', '296');");
                 }
                 writeSQL("Delete from Data where date = '' or date is null;");
             }
@@ -86,8 +87,12 @@ namespace Anwesenheitsrechner
 
         SQLiteConnection CreateConnection()
         {
+            if (!Directory.Exists(appDataPath))
+            {
+                Directory.CreateDirectory(appDataPath);
+            }
 
-            sqlite_conn = new SQLiteConnection("Data Source=database.db; Version = 3; New = True; Compress = True; ");
+            sqlite_conn = new SQLiteConnection($"Data Source={appDataPath}\\database.db; Version = 3; New = True; Compress = True; ");
             try
             {
                 sqlite_conn.Open();
@@ -112,9 +117,16 @@ namespace Anwesenheitsrechner
                     using (SQLiteDataReader sqlite_datareader = sqlite_cmd.ExecuteReader())
                     {
                         sqlite_datareader.Read();
+                        var language = sqlite_datareader.GetValue(1);
+                        sqlite_datareader.Read();
+                        var total_days = sqlite_datareader.GetValue(1);
+                        sqlite_datareader.Close();
+
                         return new Settings
                         {
-                            Language = (int)Enum.Parse(typeof(Language), sqlite_datareader.GetString(1))
+                            
+                            Language = (int)Enum.Parse(typeof(Language), language.ToString()),
+                            Total_days = int.Parse(total_days.ToString())
                         };
                     }
                 }

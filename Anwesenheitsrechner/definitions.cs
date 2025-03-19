@@ -13,6 +13,7 @@ namespace definitions
     public struct Settings
     {
         public int Language;
+        public int Total_days;
     }
     public struct Entry
     {

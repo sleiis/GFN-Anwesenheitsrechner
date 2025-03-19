@@ -45,7 +45,7 @@ namespace Anwesenheitsrechner
                 
                 ListViewItem.ListViewSubItem sickday = new ListViewItem.ListViewSubItem()
                 {
-                    Text = ((entry.GetValues(2)[0] == "1") ? "Ja" : "Nein")
+                    Text = ((entry.GetValues(2)[0] == "True") ? "Ja" : "Nein")
                 };
                 
                 var location = new ListViewItem.ListViewSubItem()
@@ -162,6 +162,7 @@ namespace Anwesenheitsrechner
             int dayCount = 0;
             int homeCount = 0;
             int workCount = 0;
+            int sickCount = 0;
 
             foreach (ListViewItem item in listView.Items)
             {
@@ -174,6 +175,10 @@ namespace Anwesenheitsrechner
                 {
                     homeCount++;
                     dayCount++;
+                }
+                if (item.SubItems[2].Text == "Ja")
+                {
+                    sickCount++;
                 }
             }
 
@@ -196,6 +201,17 @@ namespace Anwesenheitsrechner
                 stat_total_pre.ForeColor = System.Drawing.Color.Green;
                 l_hint.Text = "";
             }
+            double current_sick = Math.Round((double)sickCount * 100 / dayCount, 2);
+            double total_sick = Math.Round((double)sickCount * 100 / (dayCount+sickCount), 2);
+
+            if (current_sick > 0) l_sickdays_now.Text = $"{current_sick.ToString()} %";
+            if (total_sick > 0) l_sickdays_total.Text = $"{total_sick.ToString()} %";
+
+            if (current_sick < 10) l_sickdays_now.ForeColor = System.Drawing.Color.Green;
+            else if (current_sick > 10) l_sickdays_now.ForeColor= System.Drawing.Color.Red;
+            if (total_sick < 10) l_sickdays_total.ForeColor = System.Drawing.Color.Green;
+            else if (total_sick > 10) l_sickdays_total.ForeColor = System.Drawing.Color.Red;
+
         }
 
         public void addEntry(Entry entry)
@@ -270,6 +286,10 @@ namespace Anwesenheitsrechner
             listView.Columns[1].AutoResize(ColumnHeaderAutoResizeStyle.ColumnContent);
         }
 
+        private void label1_Click(object sender, EventArgs e)
+        {
+
+        }
     }
 
 }
