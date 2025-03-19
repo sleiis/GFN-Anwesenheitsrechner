@@ -201,8 +201,8 @@ namespace Anwesenheitsrechner
                 stat_total_pre.ForeColor = System.Drawing.Color.Green;
                 l_hint.Text = "";
             }
-            double current_sick = Math.Round((double)sickCount * 100 / dayCount, 2);
-            double total_sick = Math.Round((double)sickCount * 100 / (dayCount+sickCount), 2);
+            double current_sick = Math.Round((double)sickCount * 100 / (dayCount+sickCount), 2);
+            double total_sick = Math.Round((double)sickCount * 100 / (Settings.Total_days), 2);
 
             if (current_sick > 0) l_sickdays_now.Text = $"{current_sick.ToString()} %";
             if (total_sick > 0) l_sickdays_total.Text = $"{total_sick.ToString()} %";
